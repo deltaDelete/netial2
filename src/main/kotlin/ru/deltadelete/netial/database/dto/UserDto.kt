@@ -1,0 +1,87 @@
+package ru.deltadelete.netial.database.dto
+
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import ru.deltadelete.netial.database.dao.User
+
+open class UserDto(
+    val lastName: String,
+    val firstName: String,
+    val birthDate: Instant,
+    val userName: String,
+    val email: String,
+    val isEmailConfirmed: Boolean,
+    val lastLoginDate: Instant,
+    val creationDate: Instant,
+    val isDeleted: Boolean,
+    val deletionDate: Instant? = null,
+    val id: Long = 0L,
+) {
+    companion object {
+        fun from(user: User): UserDto {
+            return UserDto(
+                user.lastName,
+                user.firstName,
+                user.birthDate,
+                user.userName,
+                user.email,
+                user.isEmailConfirmed,
+                user.lastLoginDate,
+                user.creationDate,
+                user.isDeleted,
+                user.deletionDate,
+                user.id.value
+            )
+        }
+
+        fun new(user: UserDto, hash: String): User {
+            return User.new {
+                lastName = user.lastName
+                firstName = user.firstName
+                birthDate = user.birthDate
+                userName = user.userName
+                email = user.email
+                isEmailConfirmed = user.isEmailConfirmed
+                lastLoginDate = user.lastLoginDate
+                passwordHash = hash
+                creationDate = user.creationDate
+                isDeleted = user.isDeleted
+                deletionDate = user.deletionDate
+            }
+        }
+    }
+
+    fun map(it: User) {
+        it.lastName = lastName
+        it.firstName = firstName
+        it.birthDate = birthDate
+        it.userName = userName
+        it.email = email
+        it.isEmailConfirmed = isEmailConfirmed
+        it.lastLoginDate = lastLoginDate
+        it.creationDate = creationDate
+        it.isDeleted = isDeleted
+        it.deletionDate = deletionDate
+    }
+}
+
+class UserRegister(
+    lastName: String,
+    firstName: String,
+    birthDate: Instant,
+    userName: String,
+    email: String,
+    isEmailConfirmed: Boolean,
+    val password: String
+) : UserDto(
+    lastName,
+    firstName,
+    birthDate,
+    userName,
+    email,
+    isEmailConfirmed,
+    Clock.System.now(),
+    Clock.System.now(),
+    false,
+    null
+)
