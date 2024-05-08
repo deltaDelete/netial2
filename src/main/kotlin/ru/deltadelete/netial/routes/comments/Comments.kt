@@ -73,10 +73,12 @@ fun Application.configureComments() = routing {
                 return@post
             }
 
-            val new = Comment.new {
-                this.text = comment.text
-                this.post = post
-                this.user = user
+            val new = dbQuery {
+                Comment.new {
+                    this.text = comment.text
+                    this.post = post
+                    this.user = user
+                }
             }
 
             call.respond(HttpStatusCode.Created, CommentDto.from(new))
