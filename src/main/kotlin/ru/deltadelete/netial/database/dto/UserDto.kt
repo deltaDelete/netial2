@@ -17,20 +17,20 @@ open class UserDto(
     val deletionDate: Instant? = null,
     val id: Long = 0L,
 ) {
-    companion object {
-        fun from(user: User): UserDto {
+    companion object : MappableDto<User, UserDto> {
+        override fun from(from: User): UserDto {
             return UserDto(
-                user.lastName,
-                user.firstName,
-                user.birthDate,
-                user.userName,
-                user.email,
-                user.isEmailConfirmed,
-                user.lastLoginDate,
-                user.creationDate,
-                user.isDeleted,
-                user.deletionDate,
-                user.id.value
+                from.lastName,
+                from.firstName,
+                from.birthDate,
+                from.userName,
+                from.email,
+                from.isEmailConfirmed,
+                from.lastLoginDate,
+                from.creationDate,
+                from.isDeleted,
+                from.deletionDate,
+                from.id.value
             )
         }
 

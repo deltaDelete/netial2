@@ -14,18 +14,18 @@ data class PostDto(
     val deletionDate: Instant? = null,
     val id: Long = 0L,
 ) {
-    companion object {
-        fun from(post: Post): PostDto {
+    companion object : MappableDto<Post, PostDto> {
+        override fun from(from: Post): PostDto {
             return PostDto(
-                post.text,
-                UserDto.from(post.user),
-                post.likes,
-                post.comments,
-                post.isArticle,
-                post.creationDate,
-                post.isDeleted,
-                post.deletionDate,
-                post.id.value
+                from.text,
+                UserDto.from(from.user),
+                from.likes,
+                from.comments,
+                from.isArticle,
+                from.creationDate,
+                from.isDeleted,
+                from.deletionDate,
+                from.id.value
             )
         }
     }

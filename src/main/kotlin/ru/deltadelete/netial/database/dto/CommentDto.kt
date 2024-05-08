@@ -10,14 +10,14 @@ data class CommentDto(
     val post: Post,
     val likes: Int
 ) {
-    companion object {
-        fun from(comment: Comment): CommentDto {
+    companion object : MappableDto<Comment, CommentDto> {
+        override fun from(from: Comment): CommentDto {
             return CommentDto(
-                comment.id.value,
-                comment.text,
-                UserDto.from(comment.user),
-                comment.post,
-                comment.likes
+                from.id.value,
+                from.text,
+                UserDto.from(from.user),
+                from.post,
+                from.likes
             )
         }
     }

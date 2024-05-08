@@ -3,16 +3,18 @@ package ru.deltadelete.netial.database.dto
 import ru.deltadelete.netial.database.dao.Group
 
 data class GroupDto(
-    val id: Long,
     val name: String,
-    val description: String
+    val description: String,
+    val year: Int,
+    val id: Long = 0L,
 ) {
-    companion object {
-        fun from(group: Group): GroupDto {
+    companion object : MappableDto<Group, GroupDto> {
+        override fun from(from: Group): GroupDto {
             return GroupDto(
-                group.id.value,
-                group.name,
-                group.description
+                from.name,
+                from.description,
+                from.year,
+                from.id.value
             )
         }
 

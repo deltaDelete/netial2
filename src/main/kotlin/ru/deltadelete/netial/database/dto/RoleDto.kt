@@ -6,11 +6,11 @@ data class RoleDto(
     val id: Long,
     val name: String
 ) {
-    companion object {
-        fun from(role: Role): RoleDto {
+    companion object : MappableDto<Role, RoleDto> {
+        override fun from(from: Role): RoleDto {
             return RoleDto(
-                role.id.value,
-                role.name
+                from.id.value,
+                from.name
             )
         }
 
