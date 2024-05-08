@@ -69,10 +69,12 @@ fun Application.configurePosts() = routing {
 
             val post = call.receive<PostRequest>()
 
-            val new = Post.new {
-                this.text = post.text
-                this.user = user
-                this.isArticle = post.isArticle
+            val new = dbQuery {
+                Post.new {
+                    this.text = post.text
+                    this.user = user
+                    this.isArticle = post.isArticle
+                }
             }
 
             call.respond(HttpStatusCode.Created, PostDto.from(new))
@@ -129,8 +131,3 @@ fun Application.configurePosts() = routing {
         }
     }
 }
-
-data class PostRequest(
-    val text: String,
-    val isArticle: Boolean,
-)
