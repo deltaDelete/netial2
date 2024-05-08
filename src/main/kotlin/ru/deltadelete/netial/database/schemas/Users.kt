@@ -36,3 +36,4 @@ object Users : DeletableLongIdTable("users") {
     val lastLoginDate = timestamp("last_login_date")
 }
 
+// TODO friends

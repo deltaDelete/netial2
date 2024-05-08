@@ -1,40 +1,15 @@
 package ru.deltadelete.netial.database.dao
 
-import io.ktor.util.logging.*
 import kotlinx.datetime.Clock
-import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.update
 import org.mindrot.jbcrypt.BCrypt
 import ru.deltadelete.netial.database.dto.UserDto
-import ru.deltadelete.netial.database.schemas.*
+import ru.deltadelete.netial.database.schemas.Users
 import ru.deltadelete.netial.utils.dbQuery
 
-class UserService(database: Database) {
-    init {
-        transaction(database) {
-            SchemaUtils.create(
-                Attachments,
-                Comments,
-                CommentsLikes,
-                Groups,
-                MessageGroups,
-                MessageGroupUsers,
-                Messages,
-                MessagesAttachments,
-                Posts,
-                PostsAttachments,
-                PostsLikes,
-                Roles,
-                Users,
-                UsersGroups,
-                UsersRoles
-            )
-            val logger = KtorSimpleLogger("UsersSchema")
-            SchemaUtils.checkMappingConsistence().forEach {
-                logger.warn(it)
-            }
-        }
-    }
+class UserService {
 
     suspend fun create(user: UserDto, password: String): Long = dbQuery {
         val passwordHash = BCrypt.hashpw(password, BCrypt.gensalt())

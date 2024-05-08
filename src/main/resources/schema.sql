@@ -1,63 +1,65 @@
 CREATE TABLE users
 (
-    id               bigserial PRIMARY KEY,
-    creation_date     timestamp    NOT NULL DEFAULT NOW(),
-    deletion_date     timestamp    NULL     DEFAULT NULL,
-    is_deleted        bool         NOT NULL DEFAULT FALSE,
-    last_name         varchar(50)  NOT NULL,
-    first_name        varchar(50)  NOT NULL,
-    birth_date        timestamp    NOT NULL,
-    user_name         varchar(50)  NOT NULL UNIQUE,
-    email            varchar(320) NOT NULL,
-    email_normalized  varchar(320) NOT NULL GENERATED ALWAYS AS ( LOWER(email) ) STORED,
-    password_hash     char(60)     NOT NULL,
+    id                 bigserial PRIMARY KEY,
+    creation_date      timestamp    NOT NULL DEFAULT NOW(),
+    deletion_date      timestamp    NULL     DEFAULT NULL,
+    is_deleted         bool         NOT NULL DEFAULT FALSE,
+    last_name          varchar(50)  NOT NULL,
+    first_name         varchar(50)  NOT NULL,
+    birth_date         timestamp    NOT NULL,
+    user_name          varchar(50)  NOT NULL UNIQUE,
+    email              varchar(320) NOT NULL,
+    email_normalized   varchar(320) NOT NULL GENERATED ALWAYS AS ( LOWER(email) ) STORED,
+    password_hash      char(60)     NOT NULL,
     is_email_confirmed bool         NOT NULL DEFAULT FALSE,
     last_login_date    timestamp    NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE roles
 (
-    id           bigserial PRIMARY KEY,
-    creation_date timestamp   NOT NULL DEFAULT NOW(),
-    deletion_date timestamp   NULL     DEFAULT NULL,
-    is_deleted    bool        NOT NULL DEFAULT FALSE,
-    name         varchar(50) NOT NULL
+    id            bigserial PRIMARY KEY,
+    creation_date timestamp    NOT NULL DEFAULT NOW(),
+    deletion_date timestamp    NULL     DEFAULT NULL,
+    is_deleted    bool         NOT NULL DEFAULT FALSE,
+    name          varchar(50)  NOT NULL,
+    description   varchar(255) NOT NULL,
+    permissions   bigint       NOT NULL DEFAULT 0
 );
 
 CREATE TABLE groups
 (
-    id           bigserial PRIMARY KEY,
+    id            bigserial PRIMARY KEY,
     creation_date timestamp    NOT NULL DEFAULT NOW(),
     deletion_date timestamp    NULL     DEFAULT NULL,
     is_deleted    bool         NOT NULL DEFAULT FALSE,
-    name         varchar(50)  NOT NULL,
-    description  varchar(255) NOT NULL DEFAULT '',
-    year         int          NOT NULL DEFAULT EXTRACT(YEAR FROM NOW())
+    name          varchar(50)  NOT NULL,
+    description   varchar(255) NOT NULL DEFAULT '',
+    year          int          NOT NULL DEFAULT EXTRACT(YEAR FROM NOW())
 );
 
 CREATE TABLE posts
 (
-    id           bigserial PRIMARY KEY,
+    id            bigserial PRIMARY KEY,
     creation_date timestamp NOT NULL DEFAULT NOW(),
     deletion_date timestamp NULL     DEFAULT NULL,
     is_deleted    bool      NOT NULL DEFAULT FALSE,
-    text         text      NOT NULL,
+    text          text      NOT NULL,
     user_id       bigint    NOT NULL REFERENCES users (id),
     is_article    boolean   NOT NULL DEFAULT FALSE,
-    likes        int       NOT NULL DEFAULT 0,
-    comments     int       NOT NULL DEFAULT 0
+    likes         int       NOT NULL DEFAULT 0,
+    comments      int       NOT NULL DEFAULT 0
 );
 
 CREATE TABLE comments
 (
-    id           bigserial PRIMARY KEY,
+    id            bigserial PRIMARY KEY,
     creation_date timestamp NOT NULL DEFAULT NOW(),
     deletion_date timestamp NULL     DEFAULT NULL,
     is_deleted    bool      NOT NULL DEFAULT FALSE,
-    text         text      NOT NULL,
+    text          text      NOT NULL,
     user_id       bigint    NOT NULL REFERENCES users (id),
     post_id       bigint    NOT NULL REFERENCES posts (id),
-    likes        int       NOT NULL DEFAULT 0
+    likes         int       NOT NULL DEFAULT 0
 );
 
 --- Триггер при добавлении коммертария
@@ -113,44 +115,44 @@ EXECUTE PROCEDURE onRemoveComment();
 
 CREATE TABLE attachments
 (
-    id           bigserial PRIMARY KEY,
+    id            bigserial PRIMARY KEY,
     creation_date timestamp    NOT NULL DEFAULT NOW(),
     deletion_date timestamp    NULL     DEFAULT NULL,
     is_deleted    bool         NOT NULL DEFAULT FALSE,
-    name         varchar(255) NOT NULL,
+    name          varchar(255) NOT NULL,
     mime_type     varchar(255) NOT NULL DEFAULT 'application/octet-stream',
-    hash         char(64)     NOT NULL,
-    size         bigint       NOT NULL DEFAULT 0, -- bytes
-    user_id      bigint       NOT NULL REFERENCES users (id)
+    hash          char(64)     NOT NULL,
+    size          bigint       NOT NULL DEFAULT 0, -- bytes
+    user_id       bigint       NOT NULL REFERENCES users (id)
 );
 
 CREATE TABLE message_groups
 (
-    id           bigserial PRIMARY KEY,
+    id            bigserial PRIMARY KEY,
     creation_date timestamp    NOT NULL DEFAULT NOW(),
     deletion_date timestamp    NULL     DEFAULT NULL,
     is_deleted    bool         NOT NULL DEFAULT FALSE,
-    name         varchar(255) NOT NULL,
-    creatorId    bigint       NOT NULL REFERENCES users (id)
+    name          varchar(255) NOT NULL,
+    creatorId     bigint       NOT NULL REFERENCES users (id)
 );
 
 CREATE TABLE message_group_users
 (
     message_group_id bigint NOT NULL REFERENCES message_groups (id),
-    user_id  bigint NOT NULL REFERENCES users (id),
+    user_id          bigint NOT NULL REFERENCES users (id),
     CONSTRAINT pk_message_group_users PRIMARY KEY (message_group_id, user_id)
 );
 
 CREATE TABLE messages
 (
-    id           bigserial PRIMARY KEY,
+    id            bigserial PRIMARY KEY,
     creation_date timestamp NOT NULL DEFAULT NOW(),
     deletion_date timestamp NULL     DEFAULT NULL,
     is_deleted    bool      NOT NULL DEFAULT FALSE,
-    text         text      NOT NULL,
+    text          text      NOT NULL,
     user_id       BIGINT    NOT NULL REFERENCES users (id),
-    user_to_id     bigint    NOT NULL REFERENCES users (id),
-    group_to_id    bigint    NOT NULL REFERENCES message_groups (id),
+    user_to_id    bigint    NOT NULL REFERENCES users (id),
+    group_to_id   bigint    NOT NULL REFERENCES message_groups (id),
     reply_to      bigint    NOT NULL REFERENCES messages (id)
 );
 

@@ -4,6 +4,7 @@ import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import ru.deltadelete.netial.database.schemas.Users
+import ru.deltadelete.netial.database.schemas.UsersRoles
 
 class User(id: EntityID<Long>) : LongEntity(id) {
     companion object : LongEntityClass<User>(Users)
@@ -22,6 +23,8 @@ class User(id: EntityID<Long>) : LongEntity(id) {
     var creationDate by Users.creationDate
     var deletionDate by Users.deletionDate
 
+    // TODO Check if it is needed and works
+    val roles by Role via UsersRoles
 }
 
 fun User.Companion.findByUserName(name: String): User? {
