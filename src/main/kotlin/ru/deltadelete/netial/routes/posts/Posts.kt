@@ -12,8 +12,11 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.andIfNotNull
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.deltadelete.netial.database.dao.Post
+import ru.deltadelete.netial.database.dao.User
 import ru.deltadelete.netial.database.dto.PostDto
+import ru.deltadelete.netial.database.schemas.Permission
 import ru.deltadelete.netial.database.schemas.Posts
+import ru.deltadelete.netial.utils.checkPermission
 import ru.deltadelete.netial.utils.dbQuery
 import ru.deltadelete.netial.utils.principalUser
 
@@ -69,10 +72,31 @@ fun Application.configurePosts() = routing {
 
             val post = call.receive<PostRequest>()
 
+            val isSelf = post.user?.let {
+                it == user.id.value
+            } ?: true
+
+            checkPermission(user, Permission.CREATE_POST, Permission.SELF_CREATE_POST, isSelf) {
+                call.respond(HttpStatusCode.Forbidden, "You don't have permission to create this post")
+                return@post
+            }
+
+            val postUser = if (isSelf) {
+                user
+            } else {
+                // if isSelf is false then user cannot be null
+                dbQuery { User.findById(post.user!!) }
+            }
+
+            if (postUser == null) {
+                call.respond(HttpStatusCode.BadRequest, "Invalid user id in body")
+                return@post
+            }
+
             val new = dbQuery {
                 Post.new {
                     this.text = post.text
-                    this.user = user
+                    this.user = postUser
                     this.isArticle = post.isArticle
                 }
             }
@@ -97,8 +121,8 @@ fun Application.configurePosts() = routing {
                 return@put
             }
 
-            if (post.user.id != user.id) {
-                call.respond(HttpStatusCode.Forbidden)
+            checkPermission(user, Permission.MODIFY_POST, Permission.SELF_MODIFY_POST, user.id == post.user.id) {
+                call.respond(HttpStatusCode.Forbidden, "You don't have permission to modify this post")
                 return@put
             }
 
@@ -123,6 +147,12 @@ fun Application.configurePosts() = routing {
                 call.respond(HttpStatusCode.NotFound)
                 return@delete
             }
+
+            checkPermission(user, Permission.REMOVE_POST, Permission.SELF_REMOVE_POST, user.id == post.user.id) {
+                call.respond(HttpStatusCode.Forbidden, "You don't have permission to delete this post")
+                return@delete
+            }
+
             dbQuery {
                 post.isDeleted = true
                 post.deletionDate = Clock.System.now()

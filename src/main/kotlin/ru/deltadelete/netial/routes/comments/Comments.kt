@@ -12,8 +12,11 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.deltadelete.netial.database.dao.Comment
 import ru.deltadelete.netial.database.dao.Post
+import ru.deltadelete.netial.database.dao.User
 import ru.deltadelete.netial.database.dto.CommentDto
 import ru.deltadelete.netial.database.schemas.Comments
+import ru.deltadelete.netial.database.schemas.Permission
+import ru.deltadelete.netial.utils.checkPermission
 import ru.deltadelete.netial.utils.dbQuery
 import ru.deltadelete.netial.utils.principalUser
 
@@ -73,11 +76,32 @@ fun Application.configureComments() = routing {
                 return@post
             }
 
+            val isSelf = comment.user?.let {
+                it == user.id.value
+            } ?: true
+
+            checkPermission(user, Permission.CREATE_COMMENT, Permission.SELF_CREATE_COMMENT, isSelf) {
+                call.respond(HttpStatusCode.Forbidden, "You don't have permission to create this comment")
+                return@post
+            }
+
+            val commentUser = if (isSelf) {
+                user
+            } else {
+                // if isSelf is false then user cannot be null
+                dbQuery { User.findById(comment.user!!) }
+            }
+
+            if (commentUser == null) {
+                call.respond(HttpStatusCode.BadRequest, "Invalid user id in body")
+                return@post
+            }
+
             val new = dbQuery {
                 Comment.new {
                     this.text = comment.text
                     this.post = post
-                    this.user = user
+                    this.user = commentUser
                 }
             }
 
@@ -101,8 +125,8 @@ fun Application.configureComments() = routing {
                 return@put
             }
 
-            if (comment.user.id != user.id) {
-                call.respond(HttpStatusCode.Forbidden)
+            checkPermission(user, Permission.MODIFY_COMMENT, Permission.SELF_MODIFY_COMMENT, user.id == comment.user.id) {
+                call.respond(HttpStatusCode.Forbidden, "You don't have permission to modify this comment")
                 return@put
             }
 
@@ -127,6 +151,12 @@ fun Application.configureComments() = routing {
                 call.respond(HttpStatusCode.NotFound)
                 return@delete
             }
+
+            checkPermission(user, Permission.REMOVE_COMMENT, Permission.SELF_REMOVE_COMMENT, user.id == comment.user.id) {
+                call.respond(HttpStatusCode.Forbidden, "You don't have permission to delete this comment")
+                return@delete
+            }
+
             transaction {
                 comment.isDeleted = true
                 comment.deletionDate = Clock.System.now()
