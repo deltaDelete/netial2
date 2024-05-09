@@ -23,7 +23,6 @@ class User(id: EntityID<Long>) : LongEntity(id) {
     var creationDate by Users.creationDate
     var deletionDate by Users.deletionDate
 
-    // TODO Check if it is needed and works
     val roles by Role via UsersRoles
 }
 
