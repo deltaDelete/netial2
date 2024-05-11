@@ -40,7 +40,7 @@ fun Application.configureGroups() = routing {
 
     // GET: Get group by id
     get("/groups/{id}") {
-        val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
+        val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
 
         val group = dbQuery {
             Group.findById(id)?.let {
@@ -96,7 +96,7 @@ fun Application.configureGroups() = routing {
                 return@put
             }
 
-            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
+            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
             val newGroup = call.receive<GroupRequest>()
 
             val group = dbQuery { Group.findById(id) }
@@ -127,7 +127,7 @@ fun Application.configureGroups() = routing {
                 return@delete
             }
 
-            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
+            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
             val group = dbQuery { Group.findById(id) }
             if (group == null) {
                 call.respond(HttpStatusCode.NotFound)

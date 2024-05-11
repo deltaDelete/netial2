@@ -42,7 +42,7 @@ fun Application.configureComments() = routing {
 
     // GET: Get comment by id
     get("/comments/{id}") {
-        val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
+        val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
 
         val comment = dbQuery {
             Comment.findById(id)?.let {
@@ -117,7 +117,7 @@ fun Application.configureComments() = routing {
                 return@put
             }
 
-            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
+            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
             val text = call.receiveText()
 
             val comment = dbQuery { Comment.findById(id) }
@@ -146,7 +146,7 @@ fun Application.configureComments() = routing {
                 return@delete
             }
 
-            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
+            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
             val comment = dbQuery { Comment.findById(id)?.load(Comment::user) }
             if (comment == null) {
                 call.respond(HttpStatusCode.NotFound)

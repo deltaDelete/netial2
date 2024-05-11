@@ -12,6 +12,7 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.deltadelete.netial.database.dao.Role
 import ru.deltadelete.netial.database.dto.RoleDto
+import ru.deltadelete.netial.database.dto.UserDto
 import ru.deltadelete.netial.database.schemas.Permission
 import ru.deltadelete.netial.database.schemas.Roles
 import ru.deltadelete.netial.utils.dbQuery
@@ -37,9 +38,20 @@ fun Application.configureRoles() = routing {
         call.respond(roles)
     }
 
+    // GET: Get list of users with role
+    get("/roles/{id}/users") {
+        val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
+        val users = dbQuery {
+            Role.findById(id)?.users?.map {
+                UserDto.from(it)
+            }.orEmpty()
+        }
+        call.respond(HttpStatusCode.OK, users)
+    }
+
     // GET: Get role by id
     get("/roles/{id}") {
-        val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
+        val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
 
         val role = dbQuery {
             Role.findById(id)?.let {
@@ -90,7 +102,7 @@ fun Application.configureRoles() = routing {
                 return@put
             }
 
-            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
+            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
             val newRole = call.receive<RoleRequest>()
 
             val role = dbQuery { Role.findById(id) }
@@ -121,7 +133,7 @@ fun Application.configureRoles() = routing {
                 return@delete
             }
 
-            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
+            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
             val role = dbQuery { Role.findById(id) }
             if (role == null) {
                 call.respond(HttpStatusCode.NotFound)

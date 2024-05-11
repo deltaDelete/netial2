@@ -15,7 +15,7 @@ paths:
       description: ""
       requestBody:
         content:
-          application/json:
+          'application/json':
             schema:
               $ref: "#/components/schemas/LoginRequest"
         required: true
@@ -23,7 +23,7 @@ paths:
         "400":
           description: "Bad Request"
           content:
-            '*/*':
+            'application/json':
               schema:
                 $ref: "#/components/schemas/UserError"
               examples:
@@ -45,7 +45,7 @@ paths:
         "200":
           description: "OK"
           content:
-            '*/*':
+            'application/json':
               schema:
                 $ref: "#/components/schemas/JWTResponse"
   /protected:
@@ -55,171 +55,9 @@ paths:
         "200":
           description: "OK"
           content:
-            '*/*':
+            'application/json':
               schema:
                 type: "string"
-  /register:
-    post:
-      description: "Register user"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UserRegister"
-        required: true
-      responses:
-        "201":
-          description: "Created"
-          content:
-            '*/*':
-              schema:
-                type: "integer"
-                format: "int64"
-  /users:
-    get:
-      description: "Get list of users"
-      parameters:
-        - name: "page"
-          in: "query"
-          required: false
-          schema:
-            type: "number"
-        - name: "pageSize"
-          in: "query"
-          required: false
-          schema:
-            type: "integer"
-      responses:
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/UserDto"
-    post:
-      description: "Create user"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UserRegister"
-        required: true
-      responses:
-        "201":
-          description: "Created"
-          content:
-            '*/*':
-              schema:
-                type: "integer"
-                format: "int64"
-  /users/{id}:
-    delete:
-      description: "Delete user"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "number"
-      responses:
-        "500":
-          description: "Internal Server Error"
-          content:
-            text/plain:
-              schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: ""
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ExceptionError"
-        "403":
-          description: "Forbidden"
-          content:
-            '*/*':
-              schema:
-                type: "object"
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "object"
-    get:
-      description: "Get user info"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "number"
-      responses:
-        "500":
-          description: "Internal Server Error"
-          content:
-            text/plain:
-              schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: ""
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ExceptionError"
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/UserDto"
-        "404":
-          description: "Not Found"
-          content:
-            '*/*':
-              schema:
-                type: "object"
-    put:
-      description: "Update user"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "number"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UserDto"
-        required: true
-      responses:
-        "500":
-          description: "Internal Server Error"
-          content:
-            text/plain:
-              schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: ""
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ExceptionError"
-        "403":
-          description: "Forbidden"
-          content:
-            '*/*':
-              schema:
-                type: "object"
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                type: "object"
   /error:
     get:
       description: "Endpoint for testing json representation of errors"
@@ -233,23 +71,23 @@ paths:
               examples:
                 Example#1:
                   value: ""
-            '*/*':
+            'application/json':
               schema:
                 $ref: "#/components/schemas/ExceptionError"
   /image:
     get:
       description: ""
       parameters:
-        - name: "location"
-          in: "query"
-          required: false
-          schema:
-            type: "string"
+      - name: "location"
+        in: "query"
+        required: false
+        schema:
+          type: "string"
       responses:
         "400":
           description: "Bad Request"
           content:
-            '*/*':
+            'application/json':
               schema:
                 $ref: "#/components/schemas/UserError"
               examples:
@@ -269,24 +107,24 @@ paths:
     get:
       description: ""
       parameters:
-        - name: "Connection"
-          in: "header"
-          required: true
-          description: "Websocket Connection parameter"
-          schema:
-            type: "string"
-        - name: "Upgrade"
-          in: "header"
-          required: true
-          description: "Websocket Upgrade parameter"
-          schema:
-            type: "string"
-        - name: "Sec-WebSocket-Key"
-          in: "header"
-          required: true
-          description: "Websocket Sec-WebSocket-Key parameter"
-          schema:
-            type: "string"
+      - name: "Connection"
+        in: "header"
+        required: true
+        description: "Websocket Connection parameter"
+        schema:
+          type: "string"
+      - name: "Upgrade"
+        in: "header"
+        required: true
+        description: "Websocket Upgrade parameter"
+        schema:
+          type: "string"
+      - name: "Sec-WebSocket-Key"
+        in: "header"
+        required: true
+        description: "Websocket Sec-WebSocket-Key parameter"
+        schema:
+          type: "string"
       responses:
         "101":
           description: "Switching Protocols"
@@ -307,21 +145,21 @@ paths:
     get:
       description: "GET: Get all comments"
       parameters:
-        - name: "page"
-          in: "query"
-          required: false
-          schema:
-            type: "number"
-        - name: "pageSize"
-          in: "query"
-          required: false
-          schema:
-            type: "integer"
+      - name: "page"
+        in: "query"
+        required: false
+        schema:
+          type: "number"
+      - name: "pageSize"
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
       responses:
         "200":
           description: "OK"
           content:
-            '*/*':
+            'application/json':
               schema:
                 type: "array"
                 items:
@@ -338,32 +176,43 @@ paths:
         "400":
           description: "Bad Request"
           content:
-            '*/*':
+            'application/json':
               schema:
                 type: "object"
               examples:
                 Example#1:
+                  value: "Invalid user id in body"
+                Example#2:
                   value: "Invalid user"
+        "403":
+          description: "Forbidden"
+          content:
+            'application/json':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "You don't have permission to create this comment"
         "201":
           description: "Created"
           content:
-            '*/*':
+            'application/json':
               schema:
                 $ref: "#/components/schemas/CommentDto"
   /comments/{id}:
     delete:
       description: "DELETE: Delete comment"
       parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "number"
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "number"
       responses:
         "400":
           description: "Bad Request"
           content:
-            '*/*':
+            'application/json':
               schema:
                 type: "string"
               examples:
@@ -378,126 +227,264 @@ paths:
               examples:
                 Example#1:
                   value: ""
-            '*/*':
+            'application/json':
               schema:
                 $ref: "#/components/schemas/ExceptionError"
         "404":
           description: "Not Found"
           content:
-            '*/*':
-              schema:
-                type: "object"
-        "204":
-          description: "No Content"
-          content:
-            '*/*':
-              schema:
-                type: "object"
-    get:
-      description: "GET: Get comment by id"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "number"
-      responses:
-        "500":
-          description: "Internal Server Error"
-          content:
-            text/plain:
-              schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: ""
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ExceptionError"
-        "404":
-          description: "Not Found"
-          content:
-            '*/*':
-              schema:
-                type: "object"
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/CommentDto"
-    put:
-      description: "PUT: Update comment text"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "number"
-      responses:
-        "400":
-          description: "Bad Request"
-          content:
-            '*/*':
-              schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: "Invalid user"
-        "500":
-          description: "Internal Server Error"
-          content:
-            text/plain:
-              schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: ""
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ExceptionError"
-        "404":
-          description: "Not Found"
-          content:
-            '*/*':
+            'application/json':
               schema:
                 type: "object"
         "403":
           description: "Forbidden"
           content:
-            '*/*':
+            'application/json':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "You don't have permission to delete this comment"
+        "204":
+          description: "No Content"
+          content:
+            'application/json':
+              schema:
+                type: "object"
+    get:
+      description: "GET: Get comment by id"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "number"
+      responses:
+        "500":
+          description: "Internal Server Error"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: ""
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ExceptionError"
+        "404":
+          description: "Not Found"
+          content:
+            'application/json':
               schema:
                 type: "object"
         "200":
           description: "OK"
           content:
-            '*/*':
+            'application/json':
               schema:
                 $ref: "#/components/schemas/CommentDto"
-  /posts:
-    get:
-      description: "GET: Get all posts"
+    put:
+      description: "PUT: Update comment text"
       parameters:
-        - name: "page"
-          in: "query"
-          required: false
-          schema:
-            type: "number"
-        - name: "pageSize"
-          in: "query"
-          required: false
-          schema:
-            type: "integer"
-        - name: "isArticle"
-          in: "query"
-          required: false
-          schema:
-            type: "boolean"
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "number"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "Invalid user"
+        "500":
+          description: "Internal Server Error"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: ""
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ExceptionError"
+        "404":
+          description: "Not Found"
+          content:
+            'application/json':
+              schema:
+                type: "object"
+        "403":
+          description: "Forbidden"
+          content:
+            'application/json':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "You don't have permission to modify this comment"
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/CommentDto"
+  /register:
+    post:
+      description: "Register user"
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: "#/components/schemas/UserRegister"
+        required: true
+      responses:
+        "201":
+          description: "Created"
+          content:
+            'application/json':
+              schema:
+                type: "integer"
+                format: "int64"
+  /users:
+    get:
+      description: "Get list of users"
+      parameters:
+      - name: "page"
+        in: "query"
+        required: false
+        schema:
+          type: "number"
+      - name: "pageSize"
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
       responses:
         "200":
           description: "OK"
           content:
-            '*/*':
+            'application/json':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/UserDto"
+    post:
+      description: "Create user"
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: "#/components/schemas/UserRegister"
+        required: true
+      responses:
+        "201":
+          description: "Created"
+          content:
+            'application/json':
+              schema:
+                type: "integer"
+                format: "int64"
+  /users/{id}:
+    delete:
+      description: "Delete user"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "number"
+      responses:
+        "403":
+          description: "Forbidden"
+          content:
+            'application/json':
+              schema:
+                type: "object"
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                type: "object"
+    get:
+      description: "Get user info"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "number"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/UserDto"
+        "404":
+          description: "Not Found"
+          content:
+            'application/json':
+              schema:
+                type: "object"
+    put:
+      description: "Update user"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "number"
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: "#/components/schemas/UserDto"
+        required: true
+      responses:
+        "403":
+          description: "Forbidden"
+          content:
+            'application/json':
+              schema:
+                type: "object"
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                type: "object"
+  /posts:
+    get:
+      description: "GET: Get all posts"
+      parameters:
+      - name: "page"
+        in: "query"
+        required: false
+        schema:
+          type: "number"
+      - name: "pageSize"
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
+      - name: "isArticle"
+        in: "query"
+        required: false
+        schema:
+          type: "boolean"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            'application/json':
               schema:
                 type: "array"
                 items:
@@ -514,32 +501,43 @@ paths:
         "400":
           description: "Bad Request"
           content:
-            '*/*':
+            'application/json':
               schema:
                 type: "string"
               examples:
                 Example#1:
+                  value: "Invalid user id in body"
+                Example#2:
                   value: "Invalid user"
+        "403":
+          description: "Forbidden"
+          content:
+            'application/json':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "You don't have permission to create this post"
         "201":
           description: "Created"
           content:
-            '*/*':
+            'application/json':
               schema:
                 $ref: "#/components/schemas/PostDto"
   /posts/{id}:
     delete:
       description: "DELETE: Delete post"
       parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "number"
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "number"
       responses:
         "400":
           description: "Bad Request"
           content:
-            '*/*':
+            'application/json':
               schema:
                 type: "string"
               examples:
@@ -554,102 +552,312 @@ paths:
               examples:
                 Example#1:
                   value: ""
-            '*/*':
+            'application/json':
               schema:
                 $ref: "#/components/schemas/ExceptionError"
         "404":
           description: "Not Found"
           content:
-            '*/*':
-              schema:
-                type: "object"
-        "204":
-          description: "No Content"
-          content:
-            '*/*':
-              schema:
-                type: "object"
-    get:
-      description: "GET: Get post by id"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "number"
-      responses:
-        "500":
-          description: "Internal Server Error"
-          content:
-            text/plain:
-              schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: ""
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ExceptionError"
-        "404":
-          description: "Not Found"
-          content:
-            '*/*':
-              schema:
-                type: "object"
-        "200":
-          description: "OK"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PostDto"
-    put:
-      description: "PUT: Update post text"
-      parameters:
-        - name: "id"
-          in: "path"
-          required: true
-          schema:
-            type: "number"
-      responses:
-        "400":
-          description: "Bad Request"
-          content:
-            '*/*':
-              schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: "Invalid user"
-        "500":
-          description: "Internal Server Error"
-          content:
-            text/plain:
-              schema:
-                type: "string"
-              examples:
-                Example#1:
-                  value: ""
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ExceptionError"
-        "404":
-          description: "Not Found"
-          content:
-            '*/*':
+            'application/json':
               schema:
                 type: "object"
         "403":
           description: "Forbidden"
           content:
-            '*/*':
+            'application/json':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "You don't have permission to delete this post"
+        "204":
+          description: "No Content"
+          content:
+            'application/json':
+              schema:
+                type: "object"
+    get:
+      description: "GET: Get post by id"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "number"
+      responses:
+        "500":
+          description: "Internal Server Error"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: ""
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ExceptionError"
+        "404":
+          description: "Not Found"
+          content:
+            'application/json':
               schema:
                 type: "object"
         "200":
           description: "OK"
           content:
-            '*/*':
+            'application/json':
               schema:
                 $ref: "#/components/schemas/PostDto"
+    put:
+      description: "PUT: Update post text"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "number"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "Invalid user"
+        "500":
+          description: "Internal Server Error"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: ""
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ExceptionError"
+        "404":
+          description: "Not Found"
+          content:
+            'application/json':
+              schema:
+                type: "object"
+        "403":
+          description: "Forbidden"
+          content:
+            'application/json':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "You don't have permission to modify this post"
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/PostDto"
+  /groups:
+    get:
+      description: "GET: Get all groups"
+      parameters:
+      - name: "page"
+        in: "query"
+        required: false
+        schema:
+          type: "number"
+      - name: "pageSize"
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/GroupDto"
+    post:
+      description: "POST: Create group"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GroupRequest"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "Invalid user"
+        "403":
+          description: "Forbidden"
+          content:
+            'application/json':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "You don't have permission to create groups"
+        "201":
+          description: "Created"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/GroupDto"
+  /groups/{id}:
+    delete:
+      description: "DELETE: Delete group"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "number"
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "Invalid user"
+        "403":
+          description: "Forbidden"
+          content:
+            'application/json':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "You don't have permission to delete groups"
+        "500":
+          description: "Internal Server Error"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: ""
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ExceptionError"
+        "404":
+          description: "Not Found"
+          content:
+            'application/json':
+              schema:
+                type: "object"
+        "204":
+          description: "No Content"
+          content:
+            'application/json':
+              schema:
+                type: "object"
+    get:
+      description: "GET: Get group by id"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "number"
+      responses:
+        "500":
+          description: "Internal Server Error"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: ""
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ExceptionError"
+        "404":
+          description: "Not Found"
+          content:
+            'application/json':
+              schema:
+                type: "object"
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/GroupDto"
+    put:
+      description: "PUT: Update group"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "number"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GroupRequest"
+        required: true
+      responses:
+        "400":
+          description: "Bad Request"
+          content:
+            'application/json':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "Invalid user"
+        "403":
+          description: "Forbidden"
+          content:
+            'application/json':
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: "You don't have permission to modify groups"
+        "500":
+          description: "Internal Server Error"
+          content:
+            text/plain:
+              schema:
+                type: "string"
+              examples:
+                Example#1:
+                  value: ""
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/ExceptionError"
+        "404":
+          description: "Not Found"
+          content:
+            'application/json':
+              schema:
+                type: "object"
+        "200":
+          description: "OK"
+          content:
+            'application/json':
+              schema:
+                $ref: "#/components/schemas/GroupDto"
 components:
   securitySchemes:
     bearerAuth:
@@ -658,6 +866,43 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    HttpStatusCode:
+      type: "object"
+      properties:
+        value:
+          type: "integer"
+          format: "int32"
+        description:
+          type: "string"
+      required:
+      - "description"
+    UserError:
+      type: "object"
+      properties:
+        message:
+          type: "string"
+        statusCode:
+          $ref: "#/components/schemas/HttpStatusCode"
+      required:
+      - "message"
+      - "statusCode"
+    LoginRequest:
+      type: "object"
+      properties:
+        userName:
+          type: "string"
+        password:
+          type: "string"
+      required:
+      - "userName"
+      - "password"
+    JWTResponse:
+      type: "object"
+      properties:
+        token:
+          type: "string"
+      required:
+      - "token"
     StackTraceElement:
       type: "object"
       properties:
@@ -683,16 +928,6 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/StackTraceElement"
-    HttpStatusCode:
-      type: "object"
-      properties:
-        value:
-          type: "integer"
-          format: "int32"
-        description:
-          type: "string"
-      required:
-        - "description"
     ExceptionError:
       type: "object"
       properties:
@@ -703,39 +938,94 @@ components:
         statusCode:
           $ref: "#/components/schemas/HttpStatusCode"
       required:
-        - "exception"
-        - "message"
-        - "statusCode"
-    UserError:
-      type: "object"
-      properties:
-        message:
-          type: "string"
-        statusCode:
-          $ref: "#/components/schemas/HttpStatusCode"
-      required:
-        - "message"
-        - "statusCode"
-    LoginRequest:
-      type: "object"
-      properties:
-        userName:
-          type: "string"
-        password:
-          type: "string"
-      required:
-        - "userName"
-        - "password"
-    JWTResponse:
-      type: "object"
-      properties:
-        token:
-          type: "string"
-      required:
-        - "token"
+      - "exception"
+      - "message"
+      - "statusCode"
     Instant:
       type: "object"
       properties: {}
+    UserDto:
+      type: "object"
+      properties:
+        lastName:
+          type: "string"
+        firstName:
+          type: "string"
+        birthDate:
+          $ref: "#/components/schemas/Instant"
+        userName:
+          type: "string"
+        email:
+          type: "string"
+        lastLoginDate:
+          $ref: "#/components/schemas/Instant"
+        creationDate:
+          $ref: "#/components/schemas/Instant"
+        deletionDate:
+          $ref: "#/components/schemas/Instant"
+        id:
+          type: "integer"
+          format: "int64"
+      required:
+      - "lastName"
+      - "firstName"
+      - "birthDate"
+      - "userName"
+      - "email"
+      - "lastLoginDate"
+      - "creationDate"
+    Object:
+      type: "object"
+      properties: {}
+    ResultRow:
+      type: "object"
+      properties:
+        fieldIndex:
+          type: "object"
+      required:
+      - "fieldIndex"
+    Post:
+      type: "object"
+      properties:
+        writeValues:
+          $ref: "#/components/schemas/Object"
+        _readValues:
+          $ref: "#/components/schemas/ResultRow"
+      required:
+      - "id"
+      - "writeValues"
+    CommentDto:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        text:
+          type: "string"
+        user:
+          $ref: "#/components/schemas/UserDto"
+        post:
+          $ref: "#/components/schemas/Post"
+        likes:
+          type: "integer"
+          format: "int32"
+      required:
+      - "text"
+      - "user"
+      - "post"
+    CommentRequest:
+      type: "object"
+      properties:
+        text:
+          type: "string"
+        postId:
+          type: "integer"
+          format: "int64"
+        user:
+          type: "integer"
+          format: "int64"
+      required:
+      - "text"
     UserRegister:
       type: "object"
       properties:
@@ -761,93 +1051,14 @@ components:
           type: "integer"
           format: "int64"
       required:
-        - "password"
-        - "lastName"
-        - "firstName"
-        - "birthDate"
-        - "userName"
-        - "email"
-        - "lastLoginDate"
-        - "creationDate"
-    UserDto:
-      type: "object"
-      properties:
-        lastName:
-          type: "string"
-        firstName:
-          type: "string"
-        birthDate:
-          $ref: "#/components/schemas/Instant"
-        userName:
-          type: "string"
-        email:
-          type: "string"
-        lastLoginDate:
-          $ref: "#/components/schemas/Instant"
-        creationDate:
-          $ref: "#/components/schemas/Instant"
-        deletionDate:
-          $ref: "#/components/schemas/Instant"
-        id:
-          type: "integer"
-          format: "int64"
-      required:
-        - "lastName"
-        - "firstName"
-        - "birthDate"
-        - "userName"
-        - "email"
-        - "lastLoginDate"
-        - "creationDate"
-    Object:
-      type: "object"
-      properties: {}
-    ResultRow:
-      type: "object"
-      properties:
-        fieldIndex:
-          type: "object"
-      required:
-        - "fieldIndex"
-    Post:
-      type: "object"
-      properties:
-        writeValues:
-          $ref: "#/components/schemas/Object"
-        _readValues:
-          $ref: "#/components/schemas/ResultRow"
-      required:
-        - "id"
-        - "writeValues"
-    CommentDto:
-      type: "object"
-      properties:
-        id:
-          type: "integer"
-          format: "int64"
-        text:
-          type: "string"
-        user:
-          $ref: "#/components/schemas/UserDto"
-        post:
-          $ref: "#/components/schemas/Post"
-        likes:
-          type: "integer"
-          format: "int32"
-      required:
-        - "text"
-        - "user"
-        - "post"
-    CommentRequest:
-      type: "object"
-      properties:
-        text:
-          type: "string"
-        postId:
-          type: "integer"
-          format: "int64"
-      required:
-        - "text"
+      - "password"
+      - "lastName"
+      - "firstName"
+      - "birthDate"
+      - "userName"
+      - "email"
+      - "lastLoginDate"
+      - "creationDate"
     PostDto:
       type: "object"
       properties:
@@ -869,13 +1080,45 @@ components:
           type: "integer"
           format: "int64"
       required:
-        - "text"
-        - "user"
-        - "creationDate"
+      - "text"
+      - "user"
+      - "creationDate"
     PostRequest:
       type: "object"
       properties:
         text:
           type: "string"
+        user:
+          type: "integer"
+          format: "int64"
       required:
-        - "text"
+      - "text"
+    GroupDto:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        description:
+          type: "string"
+        year:
+          type: "integer"
+          format: "int32"
+        id:
+          type: "integer"
+          format: "int64"
+      required:
+      - "name"
+      - "description"
+    GroupRequest:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        description:
+          type: "string"
+        year:
+          type: "integer"
+          format: "int32"
+      required:
+      - "name"
+      - "description"

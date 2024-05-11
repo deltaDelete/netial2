@@ -8,9 +8,12 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.pipeline.*
+import ru.deltadelete.netial.database.dao.User
 import ru.deltadelete.netial.database.dao.UserService
+import ru.deltadelete.netial.database.dto.RoleDto
 import ru.deltadelete.netial.database.dto.UserDto
 import ru.deltadelete.netial.database.dto.UserRegister
+import ru.deltadelete.netial.utils.dbQuery
 
 
 fun Application.configureUsers() = routing {
@@ -39,6 +42,17 @@ fun Application.configureUsers() = routing {
         }
     }
 
+    // GET: Get list of roles for user
+    get("/users/{id}/roles") {
+        val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
+        val roles = dbQuery {
+            User.findById(id)?.roles?.map {
+                RoleDto.from(it)
+            }.orEmpty()
+        }
+        call.respond(HttpStatusCode.OK, roles)
+    }
+
     // Get list of users
     get("/users") {
         val page = call.request.queryParameters["page"]?.toLong() ?: 1L
@@ -51,7 +65,7 @@ fun Application.configureUsers() = routing {
 
         // Update user
         put("/users/{id}") {
-            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
+            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
             val authenticatedUserId = call.authentication.principal<JWTPrincipal>()?.subject?.toLong()
 
             if (authenticatedUserId != id) {
@@ -66,7 +80,7 @@ fun Application.configureUsers() = routing {
 
         // Delete user
         delete("/users/{id}") {
-            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
+            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
             val authenticatedUserId = call.authentication.principal<JWTPrincipal>()?.subject?.toLong()
 
             if (authenticatedUserId != id) {

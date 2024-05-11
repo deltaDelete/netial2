@@ -45,7 +45,6 @@ dependencies {
     implementation("org.postgresql:postgresql:42.7.3")
     implementation("io.ktor:ktor-server-host-common-jvm")
     implementation("io.ktor:ktor-server-status-pages-jvm")
-    implementation("io.ktor:ktor-server-resources")
     implementation("io.ktor:ktor-server-auth-jvm")
     implementation("io.ktor:ktor-server-auth-jwt-jvm")
     implementation("org.mindrot:jbcrypt:0.4")

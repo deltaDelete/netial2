@@ -45,7 +45,7 @@ fun Application.configureAttachments() = routing {
 
     // GET: Get attachment by id
     get("/attachments/{id}") {
-        val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
+        val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
 
         val attachment = dbQuery {
             Attachment.findById(id)?.let {
@@ -62,7 +62,7 @@ fun Application.configureAttachments() = routing {
     }
 
     get("/attachments/{id}/data") {
-        val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
+        val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
         val isDownload = call.request.queryParameters["download"] != null
 
         val attachment = dbQuery {
@@ -145,7 +145,7 @@ fun Application.configureAttachments() = routing {
                 return@post
             }
 
-            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
+            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
 
             val attachment = dbQuery { Attachment.findById(id)?.load(Attachment::user) }
             if (attachment == null) {
@@ -184,7 +184,7 @@ fun Application.configureAttachments() = routing {
                 return@put
             }
 
-            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
+            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
             val newAttachment = call.receive<AttachmentRequest>()
 
             val attachment = dbQuery { Attachment.findById(id)?.load(Attachment::user) }
@@ -232,7 +232,7 @@ fun Application.configureAttachments() = routing {
                 return@delete
             }
 
-            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
+            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
             val attachment = dbQuery { Attachment.findById(id)?.load(Attachment::user) }
             if (attachment == null) {
                 call.respond(HttpStatusCode.NotFound)

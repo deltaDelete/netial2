@@ -45,7 +45,7 @@ fun Application.configurePosts() = routing {
 
     // GET: Get post by id
     get("/posts/{id}") {
-        val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
+        val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
 
         val post = dbQuery {
             Post.findById(id)?.let {
@@ -113,7 +113,7 @@ fun Application.configurePosts() = routing {
                 return@put
             }
 
-            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
+            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
             val text = call.receiveText()
 
             val post = dbQuery { Post.findById(id)?.load(Post::user) }
@@ -142,7 +142,7 @@ fun Application.configurePosts() = routing {
                 return@delete
             }
 
-            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
+            val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
             val post = dbQuery { Post.findById(id)?.load(Post::user) }
             if (post == null) {
                 call.respond(HttpStatusCode.NotFound)
