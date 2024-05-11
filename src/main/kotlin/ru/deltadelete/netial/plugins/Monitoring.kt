@@ -12,6 +12,15 @@ fun Application.configureMonitoring() {
         level = Level.INFO
         filter { call -> call.request.path().startsWith("/") }
         callIdMdc("call-id")
+        if (this@configureMonitoring.developmentMode) {
+            format { call ->
+                val status = call.response.status()
+                val headers =
+                    call.request.headers.entries().joinToString("\n\t") { "${it.key}: ${it.value.joinToString("\t")}" }
+                val method = call.request.httpMethod.value
+                "${status}: $method - ${call.request.path()}\n\t$headers"
+            }
+        }
     }
     install(CallId) {
         header(HttpHeaders.XRequestId)

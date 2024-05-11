@@ -1,23 +1,31 @@
 package ru.deltadelete.netial.database.dto
 
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import ru.deltadelete.netial.database.dao.Comment
 import ru.deltadelete.netial.database.dao.Post
 
 data class CommentDto(
-    val id: Long,
     val text: String,
     val user: UserDto,
     val post: Post,
-    val likes: Int
+    val likes: Int,
+    val isDeleted: Boolean = false,
+    val creationDate: Instant = Clock.System.now(),
+    val deletionDate: Instant? = null,
+    val id: Long = 0L,
 ) {
     companion object : MappableDto<Comment, CommentDto> {
         override fun from(from: Comment): CommentDto {
             return CommentDto(
-                from.id.value,
                 from.text,
                 UserDto.from(from.user),
                 from.post,
-                from.likes
+                from.likes,
+                from.isDeleted,
+                from.creationDate,
+                from.deletionDate,
+                from.id.value,
             )
         }
     }

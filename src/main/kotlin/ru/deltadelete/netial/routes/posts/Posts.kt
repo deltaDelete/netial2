@@ -7,6 +7,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.datetime.Clock
+import org.jetbrains.exposed.dao.load
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.andIfNotNull
@@ -76,7 +77,7 @@ fun Application.configurePosts() = routing {
                 it == user.id.value
             } ?: true
 
-            checkPermission(user, Permission.CREATE_POST, Permission.SELF_CREATE_POST, isSelf) {
+            user.checkPermission(Permission.CREATE_POST, Permission.SELF_CREATE_POST, isSelf) {
                 call.respond(HttpStatusCode.Forbidden, "You don't have permission to create this post")
                 return@post
             }
@@ -115,13 +116,13 @@ fun Application.configurePosts() = routing {
             val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
             val text = call.receiveText()
 
-            val post = dbQuery { Post.findById(id) }
+            val post = dbQuery { Post.findById(id)?.load(Post::user) }
             if (post == null) {
                 call.respond(HttpStatusCode.NotFound)
                 return@put
             }
 
-            checkPermission(user, Permission.MODIFY_POST, Permission.SELF_MODIFY_POST, user.id == post.user.id) {
+            user.checkPermission(Permission.MODIFY_POST, Permission.SELF_MODIFY_POST, user.id == post.user.id) {
                 call.respond(HttpStatusCode.Forbidden, "You don't have permission to modify this post")
                 return@put
             }
@@ -142,13 +143,13 @@ fun Application.configurePosts() = routing {
             }
 
             val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
-            val post = dbQuery { Post.findById(id) }
+            val post = dbQuery { Post.findById(id)?.load(Post::user) }
             if (post == null) {
                 call.respond(HttpStatusCode.NotFound)
                 return@delete
             }
 
-            checkPermission(user, Permission.REMOVE_POST, Permission.SELF_REMOVE_POST, user.id == post.user.id) {
+            user.checkPermission(Permission.REMOVE_POST, Permission.SELF_REMOVE_POST, user.id == post.user.id) {
                 call.respond(HttpStatusCode.Forbidden, "You don't have permission to delete this post")
                 return@delete
             }

@@ -18,7 +18,24 @@ fun Application.configureHTTP() {
 
     install(CORS) {
         anyHost()
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Delete)
+        allowMethod(HttpMethod.Options)
         allowHeader(HttpHeaders.ContentType)
+        allowHeader(HttpHeaders.Authorization)
+        allowHeader(HttpHeaders.AccessControlAllowCredentials)
+        allowHeader(HttpHeaders.AccessControlAllowOrigin)
+        allowHeader(HttpHeaders.ContentLength)
+        allowHeader(HttpHeaders.Date)
+        allowHeader(HttpHeaders.Vary)
+        allowHeader(HttpHeaders.Server)
+        allowHeader(HttpHeaders.AcceptEncoding)
+        allowHeader(HttpHeaders.UserAgent)
+        allowHeader(HttpHeaders.Referrer)
+        allowHeader(HttpHeaders.CacheControl)
+        allowHeader(HttpHeaders.Pragma)
+        allowHeader(HttpHeaders.Host)
+        allowHeader(HttpHeaders.Connection)
     }
     install(DefaultHeaders)
 }

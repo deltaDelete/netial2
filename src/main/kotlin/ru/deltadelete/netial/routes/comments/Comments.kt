@@ -7,6 +7,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.datetime.Clock
+import org.jetbrains.exposed.dao.load
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -80,7 +81,7 @@ fun Application.configureComments() = routing {
                 it == user.id.value
             } ?: true
 
-            checkPermission(user, Permission.CREATE_COMMENT, Permission.SELF_CREATE_COMMENT, isSelf) {
+            user.checkPermission(Permission.CREATE_COMMENT, Permission.SELF_CREATE_COMMENT, isSelf) {
                 call.respond(HttpStatusCode.Forbidden, "You don't have permission to create this comment")
                 return@post
             }
@@ -125,7 +126,7 @@ fun Application.configureComments() = routing {
                 return@put
             }
 
-            checkPermission(user, Permission.MODIFY_COMMENT, Permission.SELF_MODIFY_COMMENT, user.id == comment.user.id) {
+            user.checkPermission(Permission.MODIFY_COMMENT, Permission.SELF_MODIFY_COMMENT, user.id == comment.user.id) {
                 call.respond(HttpStatusCode.Forbidden, "You don't have permission to modify this comment")
                 return@put
             }
@@ -146,13 +147,13 @@ fun Application.configureComments() = routing {
             }
 
             val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid id")
-            val comment = dbQuery { Comment.findById(id) }
+            val comment = dbQuery { Comment.findById(id)?.load(Comment::user) }
             if (comment == null) {
                 call.respond(HttpStatusCode.NotFound)
                 return@delete
             }
 
-            checkPermission(user, Permission.REMOVE_COMMENT, Permission.SELF_REMOVE_COMMENT, user.id == comment.user.id) {
+            user.checkPermission(Permission.REMOVE_COMMENT, Permission.SELF_REMOVE_COMMENT, user.id == comment.user.id) {
                 call.respond(HttpStatusCode.Forbidden, "You don't have permission to delete this comment")
                 return@delete
             }

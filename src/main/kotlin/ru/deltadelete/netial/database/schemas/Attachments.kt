@@ -1,6 +1,10 @@
 package ru.deltadelete.netial.database.schemas
 
 import org.jetbrains.exposed.sql.Column
+import ru.deltadelete.netial.database.schemas.Attachments.hash
+import ru.deltadelete.netial.database.schemas.Attachments.id
+import ru.deltadelete.netial.database.schemas.Attachments.mimeType
+import ru.deltadelete.netial.database.schemas.Attachments.user
 
 /**
  * Представляет собой вложение
@@ -12,7 +16,7 @@ import org.jetbrains.exposed.sql.Column
 object Attachments : DeletableLongIdTable("attachments") {
     val mimeType: Column<String> = varchar("mime_type", length = 255)
     val name: Column<String> = varchar("name", length = 255)
-    val hash: Column<String> = char("hash", length = 64)
+    val hash: Column<String> = char("hash", length = 64).default("")
     val size = long("size").default(0)
     val user = reference("user_id", Users)
 }

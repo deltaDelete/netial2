@@ -1,28 +1,31 @@
 package ru.deltadelete.netial.database.dto
 
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import ru.deltadelete.netial.database.dao.Role
 import ru.deltadelete.netial.database.schemas.Permission
 import java.util.*
 
 data class RoleDto(
-    val id: Long,
     val name: String,
-    val permissions: EnumSet<Permission> = EnumSet.noneOf(Permission::class.java)
+    val description: String = "",
+    val permissions: EnumSet<Permission> = EnumSet.noneOf(Permission::class.java),
+    val isDeleted: Boolean = false,
+    val creationDate: Instant = Clock.System.now(),
+    val deletionDate: Instant? = null,
+    val id: Long = 0L,
 ) {
     companion object : MappableDto<Role, RoleDto> {
         override fun from(from: Role): RoleDto {
             return RoleDto(
-                from.id.value,
                 from.name,
-                from.permissions
+                from.description,
+                from.permissions,
+                from.isDeleted,
+                from.creationDate,
+                from.deletionDate,
+                from.id.value,
             )
-        }
-
-        fun new(role: RoleDto): Role {
-            return Role.new {
-                name = role.name
-                permissions = role.permissions
-            }
         }
     }
 }
