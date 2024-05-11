@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Подтверждение электронной почты</title>
+</head>
+<body style="background-color: rgb(64,64,64); color: rgb(243,243,243); font-family: Arial, sans-serif; padding: 20px; font-size: 16px; width: 500px; margin: 0 auto;">
+    <div style="background-color: rgb(48,48,48); padding: 20px; border: 1px solid rgb(243,243,243); border-radius: 10px; display: flex; flex-direction: column; gap: 10px; font-size: 18px;">
+        <h2 style="background-color: rgba(255,255,255, 0.1); padding: 10px; text-align: center; border-radius: 8px; margin: 0;">
+            Уважаемый(ая) <span>$name$</span>
+        </h2>
+        <div>
+            <p>Мы рады приветствовать вас!</p>
+            <p>Для завершения регистрации вашего аккаунта $username$ необходимо подтвердить ваш адрес электронной
+                почты.</p>
+            <p>Пожалуйста, нажмите на кнопку ниже, чтобы подтвердить вашу электронную почту:</p>
+        </div>
+        <a href="https://netial.deltadelete.ru/users/$userId$/confirm?token=$confirmation$" rel="noreferrer noopener nofollow" target="_blank"
+           style="padding: 10px 20px; text-decoration: none; color: rgb(1,1,1); font-size: 24px; text-align: center; border-radius: 8px; background-color: rgb(243,243,243); display: inline-block;">Подтвердить</a>
+        <div>
+            <p>В случае, если кнопка не работает корректно, передите по ссылке: https://netial.deltadelete.ru/users/$userId$/confirm?token=$confirmation$</p>
+            <p>Если вы не регистрировались на нашем сайте, проигнорируйте это письмо.</p>
+            <p>Это письмо отправлено на адрес: $email$. Если вы получили его по ошибке, пожалуйста, сообщите нам об
+                этом.</p>
+        </div>
+    </div>
+</body>
+</html>

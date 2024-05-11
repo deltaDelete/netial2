@@ -54,4 +54,8 @@ dependencies {
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     testImplementation("io.ktor:ktor-server-test-host-jvm:2.3.10")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
+
+    implementation("com.sun.mail:jakarta.mail:2.0.1")
+
 }

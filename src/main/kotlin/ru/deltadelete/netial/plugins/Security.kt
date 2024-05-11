@@ -20,7 +20,7 @@ import ru.deltadelete.netial.types.Error
 import kotlin.time.Duration.Companion.days
 
 fun Application.configureSecurity() {
-    // Please read the jwt property from the config file if you are using EngineMain
+    // TODO: From config
     val jwtAudience = "https://netial.deltadelete.ru/"
     val jwtDomain = "https://netial.deltadelete.ru/"
     val jwtRealm = "Netial"

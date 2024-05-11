@@ -1,13 +1,20 @@
 package ru.deltadelete.netial.utils
 
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.databind.module.SimpleModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
 import io.ktor.util.pipeline.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.datetime.Instant
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.mindrot.jbcrypt.BCrypt
 import ru.deltadelete.netial.database.dao.User
 import ru.deltadelete.netial.database.schemas.Permission
+import ru.deltadelete.netial.plugins.InstantDeserializer
+import ru.deltadelete.netial.plugins.InstantSerializer
 import java.io.File
 import java.security.MessageDigest
 
@@ -77,6 +84,18 @@ inline fun User.missingPermission(
     return !hasPermission
 }
 
+fun User.generateConfirmationCode(secret: String): String {
+    val map = mapOf("id" to id.value, "email" to email, "secret" to secret).toJson()
+    val salt = BCrypt.gensalt()
+    val code = BCrypt.hashpw(map, salt)
+    return code
+}
+
+fun User.checkConfirmationCode(code: String, secret: String): Boolean {
+    val map = mapOf("id" to id.value, "email" to email, "secret" to secret).toJson()
+    return BCrypt.checkpw(map, code)
+}
+
 fun File.sha256(): String {
     val messageDigest = MessageDigest.getInstance("SHA-256")
     inputStream().use { input ->
@@ -89,4 +108,22 @@ fun File.sha256(): String {
     }
     val bytes = messageDigest.digest()
     return bytes.joinToString("") { "%02x".format(it) }
+}
+
+fun Map<String, String>.formatTemplate(template: String): String {
+    return entries.fold(template) { acc, entry ->
+        acc.replace("\$${entry.key}\$", entry.value)
+    }
+}
+
+fun Map<String, Any>.toJson(): String {
+    val mapper = jacksonObjectMapper()
+        .enable(SerializationFeature.INDENT_OUTPUT)
+        .registerModule(
+            SimpleModule()
+                .addSerializer(Instant::class.java, InstantSerializer())
+                .addDeserializer(Instant::class.java, InstantDeserializer())
+        )
+        .findAndRegisterModules()
+    return mapper.writeValueAsString(this)
 }

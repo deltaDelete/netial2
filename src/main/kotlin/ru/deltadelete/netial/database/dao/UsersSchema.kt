@@ -3,11 +3,11 @@ package ru.deltadelete.netial.database.dao
 import kotlinx.datetime.Clock
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.update
 import org.mindrot.jbcrypt.BCrypt
 import ru.deltadelete.netial.database.dto.UserDto
 import ru.deltadelete.netial.database.schemas.Users
-import ru.deltadelete.netial.utils.dbQuery
+import ru.deltadelete.netial.utils.*
+import java.io.File
 
 class UserService {
 
@@ -49,11 +49,60 @@ class UserService {
 
     suspend fun delete(id: Long) {
         dbQuery {
-            Users.update({ Users.id eq id }) {
-                it[isDeleted] = true
-                it[deletionDate] = Clock.System.now()
+            User.findByIdAndUpdate(id) {
+                it.isDeleted = true
+                it.deletionDate = Clock.System.now()
             }
         }
     }
-}
 
+    /**
+     * @return true - если письмо было отправлено, иначе false
+     */
+    suspend fun sendConfirmationEmail(id: Long): Boolean {
+        val user = dbQuery {
+            User.findById(id)
+        }
+        if (user == null) {
+            return false
+        }
+        // TODO: Template from config
+        val emailTemplate = File("docs/confirmation.html").readText()
+        val message = mapOf(
+            "username" to user.userName,
+            // TODO: Secret from config
+            "confirmation" to user.generateConfirmationCode("secret"),
+            "email" to user.email,
+            "name" to "${user.firstName} ${user.lastName}",
+            "userId" to user.id.value.toString()
+        ).formatTemplate(emailTemplate)
+
+        return Mail.sendEmail(Mail.EmailMessage(user.email, "Confirm email", message))
+    }
+
+    /**
+     * @return [EmailConfirmResult]
+     */
+    suspend fun confirmEmail(id: Long, code: String): EmailConfirmResult {
+        val user = dbQuery {
+            User.findById(id)
+        }
+        if (user == null) {
+            return EmailConfirmResult.USER_NOT_FOUND
+        }
+        val isValid = user.checkConfirmationCode(code, "secret")
+        if (!isValid) {
+            return EmailConfirmResult.INVALID_CODE
+        }
+        dbQuery {
+            user.isEmailConfirmed = true
+        }
+        return EmailConfirmResult.OK
+    }
+
+    enum class EmailConfirmResult {
+        OK,
+        USER_NOT_FOUND,
+        INVALID_CODE,
+    }
+}
