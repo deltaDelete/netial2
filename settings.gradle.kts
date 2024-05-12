@@ -8,3 +8,6 @@ dependencyResolutionManagement {
 }
 
 include("server")
+project(":server").apply {
+    name = "netial-server"
+}
