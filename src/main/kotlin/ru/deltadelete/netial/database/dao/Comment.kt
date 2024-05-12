@@ -5,7 +5,7 @@ import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import ru.deltadelete.netial.database.schemas.Comments
 
-class Comment(id: EntityID<Long>) : LongEntity(id) {
+class Comment(id: EntityID<Long>) : LongEntity(id), DeletableEntity {
     companion object : LongEntityClass<Comment>(Comments)
 
     var text by Comments.text
@@ -13,7 +13,7 @@ class Comment(id: EntityID<Long>) : LongEntity(id) {
     var post by Post referencedOn Comments.post
     var likes by Comments.likes
 
-    var isDeleted by Comments.isDeleted
-    var creationDate by Comments.creationDate
-    var deletionDate by Comments.deletionDate
+    override var isDeleted by Comments.isDeleted
+    override var creationDate by Comments.creationDate
+    override var deletionDate by Comments.deletionDate
 }

@@ -151,9 +151,9 @@ CREATE TABLE messages
     is_deleted    bool      NOT NULL DEFAULT FALSE,
     text          text      NOT NULL,
     user_id       BIGINT    NOT NULL REFERENCES users (id),
-    user_to_id    bigint    NOT NULL REFERENCES users (id),
-    group_to_id   bigint    NOT NULL REFERENCES message_groups (id),
-    reply_to      bigint    NOT NULL REFERENCES messages (id)
+    user_to_id    bigint    NULL REFERENCES users (id),
+    group_to_id   bigint    NULL REFERENCES message_groups (id),
+    reply_to_id      bigint    NULL REFERENCES messages (id)
 );
 
 CREATE TABLE messages_attachments

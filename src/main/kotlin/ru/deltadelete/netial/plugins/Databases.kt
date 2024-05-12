@@ -9,6 +9,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import ru.deltadelete.netial.database.schemas.*
 
 fun Application.configureDatabases() {
+    // TODO from config
     val database = Database.connect(
         url = "jdbc:postgresql://192.168.1.102:5432/ktor?currentSchema=test",
         user = "dev",

@@ -8,7 +8,7 @@ import ru.deltadelete.netial.database.schemas.Roles
 import ru.deltadelete.netial.database.schemas.UsersRoles
 import java.util.*
 
-class Role(id: EntityID<Long>) : LongEntity(id) {
+class Role(id: EntityID<Long>) : LongEntity(id), DeletableEntity {
     companion object : LongEntityClass<Role>(Roles)
 
     var name by Roles.name
@@ -18,9 +18,9 @@ class Role(id: EntityID<Long>) : LongEntity(id) {
         { Permission.fromBitMask(it) }
     )
 
-    var isDeleted by Roles.isDeleted
-    var creationDate by Roles.creationDate
-    var deletionDate by Roles.deletionDate
+    override var isDeleted by Roles.isDeleted
+    override var creationDate by Roles.creationDate
+    override var deletionDate by Roles.deletionDate
 
     val users by User via UsersRoles
 }

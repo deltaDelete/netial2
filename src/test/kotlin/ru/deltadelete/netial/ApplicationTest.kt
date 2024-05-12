@@ -1,8 +1,5 @@
 package ru.deltadelete.netial
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -18,11 +15,11 @@ import ru.deltadelete.netial.database.dao.User
 import ru.deltadelete.netial.database.dao.UserService
 import ru.deltadelete.netial.database.dto.UserDto
 import ru.deltadelete.netial.database.schemas.Permission
-import ru.deltadelete.netial.plugins.*
+import ru.deltadelete.netial.plugins.configureDatabases
+import ru.deltadelete.netial.plugins.configureSecurity
+import ru.deltadelete.netial.plugins.configureSerialization
 import ru.deltadelete.netial.routes.users.configureUsers
-import ru.deltadelete.netial.utils.Mail
-import ru.deltadelete.netial.utils.dbQuery
-import ru.deltadelete.netial.utils.formatTemplate
+import ru.deltadelete.netial.utils.*
 import java.util.*
 import kotlin.test.*
 
@@ -38,7 +35,7 @@ class ApplicationTest {
 
     @Test
     fun testUsersGet() = testApplication {
-        val mapper = mapper()
+        val mapper = newJsonMapper()
         application {
             configureDatabases()
             configureSecurity()
@@ -106,7 +103,7 @@ class ApplicationTest {
 
     @Test
     fun testInstantSerializer() {
-        val mapper = mapper()
+        val mapper = newJsonMapper()
         val input = Instant.fromEpochSeconds(1097712000)
         val expected = "1097712000"
 
@@ -117,7 +114,7 @@ class ApplicationTest {
 
     @Test
     fun testInstantDeserializer() {
-        val mapper = mapper()
+        val mapper = newJsonMapper()
         val input = "1097712000"
         val expected = Instant.fromEpochSeconds(1097712000)
 
@@ -128,7 +125,7 @@ class ApplicationTest {
 
     @Test
     fun testEnumSetSerializer() {
-        val mapper = jacksonObjectMapper()
+        val mapper = newJsonMapper()
         val input = EnumSet.of(Permission.CREATE_ROLE, Permission.MODIFY_ROLE)
         val expected = """
             ["CREATE_ROLE","MODIFY_ROLE"]
@@ -141,7 +138,7 @@ class ApplicationTest {
 
     @Test
     fun testEnumSetDeserializer() {
-        val mapper = jacksonObjectMapper()
+        val mapper = newJsonMapper()
         val input = """
             ["CREATE_ROLE","MODIFY_ROLE"]
         """.trimIndent()
@@ -213,10 +210,3 @@ fun Application.configureTestDatabases() {
         password = ""
     )
 }
-
-fun mapper(): ObjectMapper = jacksonObjectMapper()
-    .registerModules(
-        SimpleModule()
-            .addSerializer(Instant::class.java, InstantSerializer())
-            .addDeserializer(Instant::class.java, InstantDeserializer())
-    )

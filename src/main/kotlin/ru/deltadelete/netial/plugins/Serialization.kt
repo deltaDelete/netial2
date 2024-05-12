@@ -2,26 +2,21 @@ package ru.deltadelete.netial.plugins
 
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.*
-import com.fasterxml.jackson.databind.module.SimpleModule
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import com.fasterxml.jackson.databind.DeserializationContext
+import com.fasterxml.jackson.databind.JsonDeserializer
+import com.fasterxml.jackson.databind.JsonSerializer
+import com.fasterxml.jackson.databind.SerializerProvider
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.contentnegotiation.*
 import kotlinx.datetime.Instant
+import ru.deltadelete.netial.utils.configureJackson
 
 
 fun Application.configureSerialization() {
     install(ContentNegotiation) {
         jackson {
-            enable(SerializationFeature.INDENT_OUTPUT)
-            registerKotlinModule()
-            registerModule(
-                SimpleModule()
-                    .addSerializer(Instant::class.java, InstantSerializer())
-                    .addDeserializer(Instant::class.java, InstantDeserializer())
-            )
-            findAndRegisterModules()
+            configureJackson()
         }
     }
 }

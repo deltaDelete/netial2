@@ -1,12 +1,17 @@
 package ru.deltadelete.netial.utils
 
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
+import io.ktor.server.websocket.*
 import io.ktor.util.pipeline.*
+import io.ktor.websocket.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.datetime.Instant
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
@@ -19,6 +24,12 @@ import java.io.File
 import java.security.MessageDigest
 
 suspend fun PipelineContext<Unit, ApplicationCall>.principalUser() = dbQuery {
+    call.authentication.principal<JWTPrincipal>()?.subject?.toLong()?.let {
+        return@let User.findById(it)
+    }
+}
+
+suspend fun DefaultWebSocketServerSession.principalUser(): User? = dbQuery {
     call.authentication.principal<JWTPrincipal>()?.subject?.toLong()?.let {
         return@let User.findById(it)
     }
@@ -117,13 +128,22 @@ fun Map<String, String>.formatTemplate(template: String): String {
 }
 
 fun Map<String, Any>.toJson(): String {
-    val mapper = jacksonObjectMapper()
-        .enable(SerializationFeature.INDENT_OUTPUT)
-        .registerModule(
-            SimpleModule()
-                .addSerializer(Instant::class.java, InstantSerializer())
-                .addDeserializer(Instant::class.java, InstantDeserializer())
-        )
-        .findAndRegisterModules()
+    val mapper = newJsonMapper()
     return mapper.writeValueAsString(this)
 }
+
+fun newJsonMapper(): ObjectMapper = jacksonObjectMapper().configureJackson()
+
+fun ObjectMapper.configureJackson(): ObjectMapper = enable(SerializationFeature.INDENT_OUTPUT)
+    .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+    .registerModule(
+        SimpleModule()
+            .addSerializer(Instant::class.java, InstantSerializer())
+            .addDeserializer(Instant::class.java, InstantDeserializer())
+    )
+    .registerKotlinModule()
+    .findAndRegisterModules()
+
+val DefaultWebSocketServerSession.jsonMapper: ObjectMapper by lazy() { newJsonMapper() }
+
+fun DefaultWebSocketServerSession.JsonFrame(data: Any) = Frame.Text(jsonMapper.writeValueAsString(data))

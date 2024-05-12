@@ -4,12 +4,11 @@ import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import ru.deltadelete.netial.database.schemas.Attachments
-import ru.deltadelete.netial.database.schemas.Users
 
 /**
  * @see [Attachments]
  */
-class Attachment(id: EntityID<Long>) : LongEntity(id) {
+class Attachment(id: EntityID<Long>) : LongEntity(id), DeletableEntity {
 
     companion object : LongEntityClass<Attachment>(Attachments)
 
@@ -19,8 +18,8 @@ class Attachment(id: EntityID<Long>) : LongEntity(id) {
     var size by Attachments.size
     var user by User referencedOn Attachments.user
 
-    var isDeleted by Users.isDeleted
-    var creationDate by Users.creationDate
-    var deletionDate by Users.deletionDate
+    override var isDeleted by Attachments.isDeleted
+    override var creationDate by Attachments.creationDate
+    override var deletionDate by Attachments.deletionDate
 }
 

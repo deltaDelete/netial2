@@ -21,7 +21,7 @@ object Mail {
 
     // TODO: From config
     val emailUsername = "noreply@deltadelete.ru"
-    val emailPassword = ""
+    val emailPassword = "gWdyQnfzjfhLLUrLzuDq"
 
     val session = Session.getInstance(props, object : Authenticator() {
         override fun getPasswordAuthentication() = PasswordAuthentication(emailUsername, emailPassword)
@@ -34,7 +34,6 @@ object Mail {
             message.setRecipients(Message.RecipientType.TO, emailMessage.to.lowercase().trim())
             message.subject = emailMessage.subject
             message.sentDate = Calendar.getInstance().time
-            // TODO Template from file replace tokens like $user$ with actual data
             message.setHeader(HttpHeaders.ContentType, "text/html; charset=UTF-8")
             message.setContent(emailMessage.message, "text/html; charset=UTF-8")
             Transport.send(message)
