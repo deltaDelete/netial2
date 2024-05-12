@@ -35,5 +35,12 @@ out/
 ### VS Code ###
 .vscode/
 
+### Local ###
 netial.log
 config.json
+attachments/
+
+### OpenAPI generated garbage ###
+docs/.swagger-codegen
+docs/.swagger-codegen-ignore
+docs/index.html
