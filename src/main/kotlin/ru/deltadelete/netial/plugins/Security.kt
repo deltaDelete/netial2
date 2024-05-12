@@ -17,14 +17,14 @@ import org.mindrot.jbcrypt.BCrypt
 import ru.deltadelete.netial.database.dao.User
 import ru.deltadelete.netial.database.dao.findByUserName
 import ru.deltadelete.netial.types.Error
+import ru.deltadelete.netial.utils.Config
 import kotlin.time.Duration.Companion.days
 
 fun Application.configureSecurity() {
-    // TODO: From config
-    val jwtAudience = "https://netial.deltadelete.ru/"
-    val jwtDomain = "https://netial.deltadelete.ru/"
-    val jwtRealm = "Netial"
-    val jwtSecret = "secret"
+    val jwtAudience = Config.jwt.jwtAudience
+    val jwtDomain = Config.jwt.jwtDomain
+    val jwtRealm = Config.jwt.jwtRealm
+    val jwtSecret = Config.jwt.jwtSecret
     authentication {
         jwt("auth-jwt") {
             realm = jwtRealm

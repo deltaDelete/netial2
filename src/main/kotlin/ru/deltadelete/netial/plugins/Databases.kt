@@ -7,14 +7,14 @@ import org.jetbrains.exposed.sql.DatabaseConfig
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.deltadelete.netial.database.schemas.*
+import ru.deltadelete.netial.utils.Config
 
 fun Application.configureDatabases() {
-    // TODO from config
     val database = Database.connect(
-        url = "jdbc:postgresql://192.168.1.102:5432/ktor?currentSchema=test",
-        user = "dev",
-        driver = "org.postgresql.Driver",
-        password = "devPassword",
+        url = Config.database.url,
+        user = Config.database.user,
+        driver = Config.database.driver,
+        password = Config.database.password,
         databaseConfig = DatabaseConfig {
             keepLoadedReferencesOutOfTransaction = true
         }

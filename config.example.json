@@ -1,0 +1,27 @@
+{
+  "secret": "secret",
+  "database": {
+    "url": "jdbc:postgresql://192.168.1.1:5432/databaseName?currentSchema=schemaName",
+    "driver": "org.postgresql.Driver",
+    "user": "superuser",
+    "password": "password"
+  },
+  "jwt": {
+    "jwtAudience": "https://example.com/",
+    "jwtDomain": "https://example.com/",
+    "jwtRealm": "Example.com",
+    "jwtSecret": "secret"
+  },
+  "email": {
+    "host": "smtp.gmail.com",
+    "port": "465",
+    "login": "noreply@example.com",
+    "password": "password"
+  },
+  "templates": {
+    "emailConfirmationTemplate": "docs/confirmation.html"
+  },
+  "storage": {
+    "attachments": "attachments"
+  }
+}

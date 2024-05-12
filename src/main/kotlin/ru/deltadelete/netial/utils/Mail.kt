@@ -12,16 +12,15 @@ import kotlin.collections.set
 
 object Mail {
     val props = Properties().apply {
-        this["mail.smtp.host"] = "smtp.mail.ru"
-        this["mail.smtp.port"] = "465"
+        this["mail.smtp.host"] = Config.email.host
+        this["mail.smtp.port"] = Config.email.port
         this["mail.smtp.ssl.enable"] = "true"
         this["mail.smtp.auth"] = "true"
         this["mail.smtp.starttls.enable"] = "true"
     }
 
-    // TODO: From config
-    val emailUsername = "noreply@deltadelete.ru"
-    val emailPassword = "gWdyQnfzjfhLLUrLzuDq"
+    val emailUsername = Config.email.login
+    val emailPassword = Config.email.password
 
     val session = Session.getInstance(props, object : Authenticator() {
         override fun getPasswordAuthentication() = PasswordAuthentication(emailUsername, emailPassword)

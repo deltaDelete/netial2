@@ -66,12 +66,10 @@ class UserService {
         if (user == null) {
             return false
         }
-        // TODO: Template from config
-        val emailTemplate = File("docs/confirmation.html").readText()
+        val emailTemplate = File(Config.templates.emailConfirmationTemplate).readText()
         val message = mapOf(
             "username" to user.userName,
-            // TODO: Secret from config
-            "confirmation" to user.generateConfirmationCode("secret"),
+            "confirmation" to user.generateConfirmationCode(Config.secret),
             "email" to user.email,
             "name" to "${user.firstName} ${user.lastName}",
             "userId" to user.id.value.toString()

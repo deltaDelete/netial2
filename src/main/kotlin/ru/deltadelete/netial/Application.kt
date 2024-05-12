@@ -33,6 +33,7 @@ fun main() {
 }
 
 fun Application.module() {
+    loadConfig()
     configureHTTP()
     configureSecurity()
     configureMonitoring()

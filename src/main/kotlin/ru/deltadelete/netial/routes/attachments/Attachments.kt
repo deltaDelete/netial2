@@ -18,10 +18,7 @@ import ru.deltadelete.netial.database.dao.User
 import ru.deltadelete.netial.database.dto.AttachmentDto
 import ru.deltadelete.netial.database.schemas.Attachments
 import ru.deltadelete.netial.database.schemas.Permission
-import ru.deltadelete.netial.utils.checkPermission
-import ru.deltadelete.netial.utils.dbQuery
-import ru.deltadelete.netial.utils.principalUser
-import ru.deltadelete.netial.utils.sha256
+import ru.deltadelete.netial.utils.*
 import java.io.File
 
 fun Application.configureAttachments() = routing {
@@ -76,8 +73,7 @@ fun Application.configureAttachments() = routing {
             return@get
         }
 
-        // TODO: Add config for attachments storage folder
-        val file = File("attachments/${attachment.id}")
+        val file = attachmentFile(attachment.id.toString())
         if (!file.exists()) {
             call.respond(HttpStatusCode.NotFound, "File data not found. Probably it was deleted or not uploaded yet.")
         }
@@ -159,8 +155,8 @@ fun Application.configureAttachments() = routing {
                 return@post
             }
 
-            val file = File("attachments/${attachment.id}")
-            file.parentFile?.mkdirs()
+            val file = attachmentFile(attachment.id.toString())
+
             file.createNewFile()
             launch(Dispatchers.IO) {
                 call.receiveStream().use { attachmentStream ->
@@ -253,4 +249,14 @@ fun Application.configureAttachments() = routing {
             call.respond(HttpStatusCode.NoContent)
         }
     }
+}
+
+private fun attachmentFile(name: String): File {
+    val dir = File(Config.storage.attachments)
+    if (!dir.exists()) {
+        dir.mkdir()
+    }
+    dir.mkdir()
+    val file = File(dir, name)
+    return file
 }
