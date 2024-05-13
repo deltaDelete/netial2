@@ -21,7 +21,7 @@ class Post(id: EntityID<Long>) : LongEntity(id), DeletableEntity {
     override var creationDate by Posts.creationDate
     override var deletionDate by Posts.deletionDate
 
-    val commentList by Comment referencedOn Comments.post
+    val commentList by Comment referrersOn Comments.post
     val attachments by Attachment via PostsAttachments
     val likeList by User via PostsLikes
 }

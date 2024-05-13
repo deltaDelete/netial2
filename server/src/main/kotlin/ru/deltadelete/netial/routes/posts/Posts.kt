@@ -8,13 +8,15 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.datetime.Clock
 import org.jetbrains.exposed.dao.load
-import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.dao.with
 import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.andIfNotNull
 import org.jetbrains.exposed.sql.transactions.transaction
+import ru.deltadelete.netial.database.dao.Comment
 import ru.deltadelete.netial.database.dao.Post
 import ru.deltadelete.netial.database.dao.User
+import ru.deltadelete.netial.database.dto.CommentDto
 import ru.deltadelete.netial.database.dto.PostDto
+import ru.deltadelete.netial.database.schemas.Comments
 import ru.deltadelete.netial.database.schemas.Permission
 import ru.deltadelete.netial.database.schemas.Posts
 import ru.deltadelete.netial.utils.checkPermission
@@ -26,16 +28,14 @@ fun Application.configurePosts() = routing {
     get("/posts") {
         val page = call.request.queryParameters["page"]?.toLong() ?: 1
         val pageSize = call.request.queryParameters["pageSize"]?.toInt() ?: 10
-        val isArticle = call.request.queryParameters["isArticle"]?.toBoolean()
+        val isArticle = call.request.queryParameters["isArticle"] != null
         val offset = (page - 1) * pageSize
 
         val posts = dbQuery {
-            return@dbQuery Post.find {
-                Posts.deletionDate.eq(null)
-                    .and(Posts.isDeleted eq false)
-                    .andIfNotNull { isArticle?.let { Posts.isArticle eq it } }
+            Post.find {
+                Posts.isDeleted eq false
             }
-                .orderBy(Posts.id to SortOrder.ASC)
+                .with(Post::user)
                 .limit(pageSize, offset)
                 .map { PostDto.from(it) }
         }
@@ -61,6 +61,30 @@ fun Application.configurePosts() = routing {
         call.respond(post)
     }
 
+    // GET: Get posts comments by id
+    get("/posts/{id}/comments") {
+        val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
+
+        val missing = dbQuery {
+            Post.findById(id) == null
+        }
+
+        if (missing) {
+            call.respond(HttpStatusCode.NotFound)
+            return@get
+        }
+
+        val comments = dbQuery {
+            Comment.find {
+                (Comments.post eq id) and (Comments.isDeleted eq false)
+            }.map {
+                CommentDto.from(it)
+            }
+        }
+
+        call.respond(comments)
+    }
+
     authenticate("auth-jwt") {
         // POST: Create post
         post("/posts") {
@@ -73,7 +97,7 @@ fun Application.configurePosts() = routing {
 
             val post = call.receive<PostRequest>()
 
-            val isSelf = post.user?.let {
+            val isSelf = post.userId?.let {
                 it == user.id.value
             } ?: true
 
@@ -86,7 +110,7 @@ fun Application.configurePosts() = routing {
                 user
             } else {
                 // if isSelf is false then user cannot be null
-                dbQuery { User.findById(post.user!!) }
+                dbQuery { User.findById(post.userId!!) }
             }
 
             if (postUser == null) {
@@ -103,6 +127,10 @@ fun Application.configurePosts() = routing {
             }
 
             call.respond(HttpStatusCode.Created, PostDto.from(new))
+        }
+
+        post("/posts/{id}/likes") {
+
         }
 
         // PUT: Update post text

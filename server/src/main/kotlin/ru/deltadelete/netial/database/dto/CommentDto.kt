@@ -3,12 +3,11 @@ package ru.deltadelete.netial.database.dto
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import ru.deltadelete.netial.database.dao.Comment
-import ru.deltadelete.netial.database.dao.Post
 
 data class CommentDto(
     val text: String,
     val user: UserDto,
-    val post: Post,
+    val post: PostDto,
     val likes: Int,
     val isDeleted: Boolean = false,
     val creationDate: Instant = Clock.System.now(),
@@ -20,7 +19,7 @@ data class CommentDto(
             return CommentDto(
                 from.text,
                 UserDto.from(from.user),
-                from.post,
+                PostDto.from(from.post),
                 from.likes,
                 from.isDeleted,
                 from.creationDate,

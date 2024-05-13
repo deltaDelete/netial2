@@ -77,7 +77,7 @@ fun Application.configureComments() = routing {
                 return@post
             }
 
-            val isSelf = comment.user?.let {
+            val isSelf = comment.userId?.let {
                 it == user.id.value
             } ?: true
 
@@ -90,7 +90,7 @@ fun Application.configureComments() = routing {
                 user
             } else {
                 // if isSelf is false then user cannot be null
-                dbQuery { User.findById(comment.user!!) }
+                dbQuery { User.findById(comment.userId!!) }
             }
 
             if (commentUser == null) {
@@ -106,7 +106,7 @@ fun Application.configureComments() = routing {
                 }
             }
 
-            call.respond(HttpStatusCode.Created, CommentDto.from(new))
+            call.respond(HttpStatusCode.Created, dbQuery { CommentDto.from(new) })
         }
 
         // PUT: Update comment text

@@ -22,6 +22,7 @@ fun Application.configureUsers() = routing {
     val userService = UserService()
 
     // TODO: CHANGE AND RESET PASSWORD
+    // TODO: AVATARS
 
     // Create user
     post("/users") {

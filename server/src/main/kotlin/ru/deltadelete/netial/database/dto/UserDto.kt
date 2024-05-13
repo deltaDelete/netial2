@@ -71,7 +71,6 @@ class UserRegister(
     birthDate: Instant,
     userName: String,
     email: String,
-    isEmailConfirmed: Boolean,
     val password: String
 ) : UserDto(
     lastName,
@@ -79,7 +78,7 @@ class UserRegister(
     birthDate,
     userName,
     email,
-    isEmailConfirmed,
+    false,
     Clock.System.now(),
     Clock.System.now(),
     false,
