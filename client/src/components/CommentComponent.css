@@ -1,0 +1,7 @@
+.comment {
+    @apply gap-1 flex flex-col;
+
+    & .comment-text {
+        @apply p-4 bg-background border border-white border-opacity-20 rounded-xl;
+    }
+}

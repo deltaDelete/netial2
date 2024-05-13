@@ -1,0 +1,31 @@
+.dialog__overlay {
+    @apply bg-black/50 fixed inset-0;
+}
+
+.dialog__positioner {
+    @apply fixed inset-0 flex items-center justify-center;
+    & .dialog__content {
+        @apply flex flex-col items-stretch gap-4 justify-center max-sm:min-w-[90dvw] sm:min-w-[50dvw] lg:min-w-[30dvw];
+        transform-origin: center center;
+        animation: contentHide 100ms ease-in forwards;
+        &[data-expanded] {
+            animation: contentShow 100ms ease-out;
+        }
+
+        & .dialog__header {
+            @apply flex flex-row justify-between w-full;
+
+            & .dialog__title {
+                @apply text-2xl font-bold;
+            }
+
+            & .dialog__close {
+                @apply self-end;
+            }
+        }
+
+        & .dialog__description {
+            @apply text-start text-wrap break-words;
+        }
+    }
+}

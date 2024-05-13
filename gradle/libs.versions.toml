@@ -7,6 +7,7 @@ h2 = "2.1.214"
 postgresql = "42.7.3"
 jbcrypt = "0.4"
 logback = "1.4.14"
+node-gradle = "7.0.2"
 
 [libraries]
 ktor-server-core-jvm = { group = "io.ktor", name = "ktor-server-core-jvm", version.ref = "ktor" }
@@ -45,3 +46,4 @@ kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
+node-gradle = { id = "com.github.node-gradle.node", version.ref = "node-gradle"}

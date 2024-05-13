@@ -1,0 +1,19 @@
+.text-input {
+    @apply flex flex-col gap-1;
+
+    & .text-input-input {
+        @apply appearance-none border border-white/20 rounded-xl w-full py-2 px-3 leading-tight focus:outline-none
+        bg-background text-white focus:bg-background/50 autofill:bg-yellow-300;
+
+        &input {
+            @apply overflow-scroll resize-y;
+        }
+
+        &[data-invalid] {
+            @apply border-red-500;
+        }
+    }
+    & .text-input-error {
+        @apply text-red-500;
+    }
+}
