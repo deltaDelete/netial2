@@ -23,7 +23,7 @@ import ru.deltadelete.netial.utils.principalUser
 
 fun Application.configureComments() = routing {
     // GET: Get all comments
-    get("/comments") {
+    get("/api/comments") {
         val page = call.request.queryParameters["page"]?.toLong() ?: 1
         val pageSize = call.request.queryParameters["pageSize"]?.toInt() ?: 10
         val offset = (page - 1) * pageSize
@@ -41,7 +41,7 @@ fun Application.configureComments() = routing {
     }
 
     // GET: Get comment by id
-    get("/comments/{id}") {
+    get("/api/comments/{id}") {
         val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
 
         val comment = dbQuery {
@@ -60,7 +60,7 @@ fun Application.configureComments() = routing {
 
     authenticate("auth-jwt") {
         // POST: Create new comment
-        post("/comments") {
+        post("/api/comments") {
             val user = principalUser()
 
             if (user == null) {
@@ -110,7 +110,7 @@ fun Application.configureComments() = routing {
         }
 
         // PUT: Update comment text
-        put("/comments/{id}") {
+        put("/api/comments/{id}") {
             val user = principalUser()
             if (user == null) {
                 call.respond(HttpStatusCode.BadRequest, "Invalid user")
@@ -139,7 +139,7 @@ fun Application.configureComments() = routing {
         }
 
         // DELETE: Delete comment
-        delete("/comments/{id}") {
+        delete("/api/comments/{id}") {
             val user = principalUser()
             if (user == null) {
                 call.respond(HttpStatusCode.BadRequest, "Invalid user")

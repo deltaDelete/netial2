@@ -20,7 +20,7 @@ import ru.deltadelete.netial.utils.principalUser
 
 fun Application.configureGroups() = routing {
     // GET: Get all groups
-    get("/groups") {
+    get("/api/groups") {
         val page = call.request.queryParameters["page"]?.toLong() ?: 1
         val pageSize = call.request.queryParameters["pageSize"]?.toInt() ?: 10
         val offset = (page - 1) * pageSize
@@ -39,7 +39,7 @@ fun Application.configureGroups() = routing {
     }
 
     // GET: Get group by id
-    get("/groups/{id}") {
+    get("/api/groups/{id}") {
         val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
 
         val group = dbQuery {
@@ -58,7 +58,7 @@ fun Application.configureGroups() = routing {
 
     authenticate("auth-jwt") {
         // POST: Create group
-        post("/groups") {
+        post("/api/groups") {
             val user = principalUser()
             if (user == null) {
                 call.respond(HttpStatusCode.BadRequest, "Invalid user")
@@ -84,7 +84,7 @@ fun Application.configureGroups() = routing {
         }
 
         // PUT: Update group
-        put("/groups/{id}") {
+        put("/api/groups/{id}") {
             val user = principalUser()
             if (user == null) {
                 call.respond(HttpStatusCode.BadRequest, "Invalid user")
@@ -115,7 +115,7 @@ fun Application.configureGroups() = routing {
         }
 
         // DELETE: Delete group
-        delete("/groups/{id}") {
+        delete("/api/groups/{id}") {
             val user = principalUser()
             if (user == null) {
                 call.respond(HttpStatusCode.BadRequest, "Invalid user")

@@ -1,12 +1,33 @@
-import com.github.gradle.node.npm.task.NpmTask
+import com.github.gradle.node.pnpm.task.PnpmTask
 
 plugins {
     alias(libs.plugins.node.gradle)
 }
 
-tasks.register<NpmTask>("npmDev") {
-    dependsOn(tasks.npmInstall)
-    npmCommand = listOf("run", "dev")
+tasks.register<PnpmTask>("pnpmDev") {
+    dependsOn(tasks.pnpmInstall)
+    pnpmDev()
+}
+
+tasks.register<PnpmTask>("pnpmBuild") {
+    dependsOn(tasks.pnpmInstall)
+    pnpmBuild()
+}
+
+tasks.register<Zip>("package") {
+    val pnpmBuild = tasks.getByPath("pnpmBuild")
+    dependsOn(pnpmBuild)
+    archiveFileName = "client.zip"
+    destinationDirectory = File(projectDir, "build")
+    from(pnpmBuild)
+}
+
+tasks.register<Delete>("clean") {
+    delete("build", "dist")
+}
+
+fun PnpmTask.pnpmDev() {
+    pnpmCommand = listOf("run", "dev")
     ignoreExitValue = false
     environment = mapOf()
     workingDir = projectDir
@@ -16,6 +37,7 @@ tasks.register<NpmTask>("npmDev") {
     }
     inputs.dir("node_modules")
     inputs.file("package.json")
+    inputs.file("pnpm-lock.yaml")
     inputs.file("tsconfig.json")
     inputs.file("vite.config.ts")
     inputs.file("index.html")
@@ -25,9 +47,8 @@ tasks.register<NpmTask>("npmDev") {
     }
 }
 
-tasks.register<NpmTask>("npmBuild") {
-    dependsOn(tasks.npmInstall)
-    npmCommand = listOf("run", "build")
+fun PnpmTask.pnpmBuild() {
+    pnpmCommand = listOf("run", "build")
     ignoreExitValue = false
     environment = mapOf()
     workingDir = projectDir
@@ -36,17 +57,10 @@ tasks.register<NpmTask>("npmBuild") {
     }
     inputs.dir("node_modules")
     inputs.file("package.json")
+    inputs.file("pnpm-lock.yaml")
     inputs.file("tsconfig.json")
     inputs.file("vite.config.ts")
     inputs.file("index.html")
     inputs.dir("src")
     outputs.dir("dist")
-}
-
-tasks.register<Zip>("package") {
-    val npmBuild = tasks.getByPath("npmBuild")
-    dependsOn(npmBuild)
-    archiveFileName = "client.zip"
-    destinationDirectory = File(projectDir, "build")
-    from(npmBuild)
 }

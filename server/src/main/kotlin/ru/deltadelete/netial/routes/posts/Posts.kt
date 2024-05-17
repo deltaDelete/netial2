@@ -25,7 +25,7 @@ import ru.deltadelete.netial.utils.principalUser
 
 fun Application.configurePosts() = routing {
     // GET: Get all posts
-    get("/posts") {
+    get("/api/posts") {
         val page = call.request.queryParameters["page"]?.toLong() ?: 1
         val pageSize = call.request.queryParameters["pageSize"]?.toInt() ?: 10
         val isArticle = call.request.queryParameters["isArticle"] != null
@@ -44,7 +44,7 @@ fun Application.configurePosts() = routing {
     }
 
     // GET: Get post by id
-    get("/posts/{id}") {
+    get("/api/posts/{id}") {
         val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
 
         val post = dbQuery {
@@ -62,7 +62,7 @@ fun Application.configurePosts() = routing {
     }
 
     // GET: Get posts comments by id
-    get("/posts/{id}/comments") {
+    get("/api/posts/{id}/comments") {
         val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
 
         val missing = dbQuery {
@@ -87,7 +87,7 @@ fun Application.configurePosts() = routing {
 
     authenticate("auth-jwt") {
         // POST: Create post
-        post("/posts") {
+        post("/api/posts") {
             val user = principalUser()
 
             if (user == null) {
@@ -129,12 +129,12 @@ fun Application.configurePosts() = routing {
             call.respond(HttpStatusCode.Created, PostDto.from(new))
         }
 
-        post("/posts/{id}/likes") {
+        post("/api/posts/{id}/likes") {
 
         }
 
         // PUT: Update post text
-        put("/posts/{id}") {
+        put("/api/posts/{id}") {
             val user = principalUser()
             if (user == null) {
                 call.respond(HttpStatusCode.BadRequest, "Invalid user")
@@ -163,7 +163,7 @@ fun Application.configurePosts() = routing {
         }
 
         // DELETE: Delete post
-        delete("/posts/{id}") {
+        delete("/api/posts/{id}") {
             val user = principalUser()
             if (user == null) {
                 call.respond(HttpStatusCode.BadRequest, "Invalid user")

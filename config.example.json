@@ -19,9 +19,10 @@
     "password": "password"
   },
   "templates": {
-    "emailConfirmationTemplate": "docs/confirmation.html"
+    "emailConfirmationTemplate": "templates/confirmation.html"
   },
   "storage": {
-    "attachments": "attachments"
+    "attachments": "attachments",
+    "wwwRoot": "wwwroot"
   }
 }

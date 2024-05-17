@@ -7,6 +7,7 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import ru.deltadelete.netial.types.Error
+import ru.deltadelete.netial.utils.Config
 
 fun Application.configureRouting() {
     install(StatusPages) {
@@ -34,11 +35,14 @@ fun Application.configureRouting() {
     }
     routing {
         // Endpoint for testing json representation of errors
-        get("/error") {
+        get("/api/error") {
             throw Exception("Error!")
         }
 
-        // Static plugin. Try to access `/static/index.html`
-        staticResources("/static", "static")
+        singlePageApplication {
+            useResources = false
+            filesPath = Config.storage.wwwRoot
+            defaultPage = "index.html"
+        }
     }
 }

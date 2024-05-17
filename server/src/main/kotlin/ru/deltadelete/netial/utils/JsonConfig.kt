@@ -15,7 +15,7 @@ import kotlin.reflect.KProperty
 @Experimental
 class JsonConfig(
     private val file: File,
-    val mapper: ObjectMapper
+    val mapper: ObjectMapper,
 ) {
 
     var map: Map<String, Any> = emptyMap()
@@ -80,10 +80,11 @@ object Config {
     )
 
     class TemplatesConfig(
-        val emailConfirmationTemplate: String
+        val emailConfirmationTemplate: String,
     )
 
     class StorageConfig(
-        val attachments: String
+        val attachments: String,
+        val wwwRoot: String,
     )
 }

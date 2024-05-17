@@ -30,7 +30,7 @@ fun Application.configureSockets() {
     routing {
         val sessions = mutableMapOf<Long,  WebSocketServerSession>()
         authenticate("auth-jwt") {
-            webSocket("/ws") {
+            webSocket("/api/ws") {
                 val user = principalUser()
                 if (user == null) {
                     close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "Unauthorized"))

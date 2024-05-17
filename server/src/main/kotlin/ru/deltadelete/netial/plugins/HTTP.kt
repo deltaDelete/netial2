@@ -10,10 +10,8 @@ import io.ktor.server.routing.*
 
 fun Application.configureHTTP() {
     routing {
-        openAPI(path = "openapi")
-    }
-    routing {
-        swaggerUI(path = "swagger")
+        openAPI(path = "api/openapi")
+        swaggerUI(path = "api/swagger")
     }
 
     install(CORS) {

@@ -52,68 +52,70 @@ fun Application.configureSecurity() {
     }
 
     routing {
-        post("/login") {
-            if (call.request.header(HttpHeaders.ContentType) != "application/json") {
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    Error.UserError("Wrong content type", HttpStatusCode.BadRequest)
-                )
-                return@post
-            }
-            val credentials = call.receive<LoginRequest>()
+        route("/api") {
+            post("/login") {
+                if (call.request.header(HttpHeaders.ContentType) != "application/json") {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        Error.UserError("Wrong content type", HttpStatusCode.BadRequest)
+                    )
+                    return@post
+                }
+                val credentials = call.receive<LoginRequest>()
 
-            val user = transaction {
-                User.findByUserName(credentials.userName)
-            }
+                val user = transaction {
+                    User.findByUserName(credentials.userName)
+                }
 
-            if (user == null) {
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    Error.UserError("Пользователь с этим именем не найден", HttpStatusCode.BadRequest)
-                )
-                return@post
-            }
+                if (user == null) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        Error.UserError("Пользователь с этим именем не найден", HttpStatusCode.BadRequest)
+                    )
+                    return@post
+                }
 
-            if (
-                !(credentials.userName == user.userName
-                        && BCrypt.checkpw(credentials.password, user.passwordHash))
-            ) {
-                call.respond(
-                    HttpStatusCode.BadRequest,
-                    Error.UserError("Неверное имя пользователя или пароль", HttpStatusCode.BadRequest)
-                )
-                return@post
-            }
+                if (
+                    !(credentials.userName == user.userName
+                            && BCrypt.checkpw(credentials.password, user.passwordHash))
+                ) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        Error.UserError("Неверное имя пользователя или пароль", HttpStatusCode.BadRequest)
+                    )
+                    return@post
+                }
 
-            val expireTime = Clock.System.now().plus(7.days)
-            val token = JWT.create()
-                .withAudience(jwtAudience)
-                .withIssuer(jwtDomain)
-                .withSubject(user.id.toString())
-                .withClaim("userName", user.userName)
-                .withIssuedAt(Clock.System.now().toJavaInstant())
-                .withExpiresAt(expireTime.toJavaInstant())
-                .sign(Algorithm.HMAC256(jwtSecret))
-            call.respond(
-                HttpStatusCode.OK,
-                JWTResponse(token)
-            )
-
-            transaction {
-                user.lastLoginDate = Clock.System.now()
-            }
-        }
-
-        authenticate("auth-jwt", strategy = AuthenticationStrategy.FirstSuccessful) {
-            get("/protected") {
-                val principal = call.principal<JWTPrincipal>()
+                val expireTime = Clock.System.now().plus(7.days)
+                val token = JWT.create()
+                    .withAudience(jwtAudience)
+                    .withIssuer(jwtDomain)
+                    .withSubject(user.id.toString())
+                    .withClaim("userName", user.userName)
+                    .withIssuedAt(Clock.System.now().toJavaInstant())
+                    .withExpiresAt(expireTime.toJavaInstant())
+                    .sign(Algorithm.HMAC256(jwtSecret))
                 call.respond(
                     HttpStatusCode.OK,
-                    """
+                    JWTResponse(token)
+                )
+
+                transaction {
+                    user.lastLoginDate = Clock.System.now()
+                }
+            }
+
+            authenticate("auth-jwt", strategy = AuthenticationStrategy.FirstSuccessful) {
+                get("/protected") {
+                    val principal = call.principal<JWTPrincipal>()
+                    call.respond(
+                        HttpStatusCode.OK,
+                        """
                         Hello from protected route, ${principal?.getClaim("userName", String::class)}!
                         Token expires at ${principal?.expiresAt?.toInstant()?.toKotlinInstant()} 
                         """.trimIndent()
-                )
+                    )
+                }
             }
         }
     }

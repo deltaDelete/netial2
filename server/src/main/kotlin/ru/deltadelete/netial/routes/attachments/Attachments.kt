@@ -23,7 +23,7 @@ import java.io.File
 
 fun Application.configureAttachments() = routing {
     // GET: Get all attachments
-    get("/attachments") {
+    get("/api/attachments") {
         val page = call.request.queryParameters["page"]?.toLong() ?: 1
         val pageSize = call.request.queryParameters["pageSize"]?.toInt() ?: 10
         val offset = (page - 1) * pageSize
@@ -41,7 +41,7 @@ fun Application.configureAttachments() = routing {
     }
 
     // GET: Get attachment by id
-    get("/attachments/{id}") {
+    get("/api/attachments/{id}") {
         val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
 
         val attachment = dbQuery {
@@ -58,7 +58,7 @@ fun Application.configureAttachments() = routing {
         call.respond(HttpStatusCode.OK, attachment)
     }
 
-    get("/attachments/{id}/data") {
+    get("/api/attachments/{id}/data") {
         val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
         val isDownload = call.request.queryParameters["download"] != null
 
@@ -91,7 +91,7 @@ fun Application.configureAttachments() = routing {
 
     authenticate("auth-jwt") {
         // POST: Create new attachment
-        post("/attachments") {
+        post("/api/attachments") {
             val user = principalUser()
 
             if (user == null) {
@@ -134,7 +134,7 @@ fun Application.configureAttachments() = routing {
         }
 
         // POST: Upload attachment data
-        post("/attachments/{id}/data") {
+        post("/api/attachments/{id}/data") {
             val user = principalUser()
             if (user == null) {
                 call.respond(HttpStatusCode.BadRequest, "Invalid user")
@@ -173,7 +173,7 @@ fun Application.configureAttachments() = routing {
         }
 
         // PUT: Update attachment
-        put("/attachments/{id}") {
+        put("/api/attachments/{id}") {
             val user = principalUser()
             if (user == null) {
                 call.respond(HttpStatusCode.BadRequest, "Invalid user")
@@ -221,7 +221,7 @@ fun Application.configureAttachments() = routing {
         }
 
         // DELETE: Delete attachment
-        delete("/attachments/{id}") {
+        delete("/api/attachments/{id}") {
             val user = principalUser()
             if (user == null) {
                 call.respond(HttpStatusCode.BadRequest, "Invalid user")

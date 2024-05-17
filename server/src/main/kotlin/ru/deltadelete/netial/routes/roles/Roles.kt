@@ -21,7 +21,7 @@ import ru.deltadelete.netial.utils.principalUser
 
 fun Application.configureRoles() = routing {
     // GET: Get all roles
-    get("/roles") {
+    get("/api/roles") {
         val page = call.request.queryParameters["page"]?.toLong() ?: 1
         val pageSize = call.request.queryParameters["pageSize"]?.toInt() ?: 10
         val offset = (page - 1) * pageSize
@@ -39,7 +39,7 @@ fun Application.configureRoles() = routing {
     }
 
     // GET: Get list of users with role
-    get("/roles/{id}/users") {
+    get("/api/roles/{id}/users") {
         val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
         val users = dbQuery {
             Role.findById(id)?.users?.map {
@@ -50,7 +50,7 @@ fun Application.configureRoles() = routing {
     }
 
     // GET: Get role by id
-    get("/roles/{id}") {
+    get("/api/roles/{id}") {
         val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
 
         val role = dbQuery {
@@ -69,7 +69,7 @@ fun Application.configureRoles() = routing {
 
     authenticate("auth-jwt") {
         // POST: Create new role
-        post("/roles") {
+        post("/api/roles") {
             val user = principalUser()
 
             if (user == null) {
@@ -95,7 +95,7 @@ fun Application.configureRoles() = routing {
         }
 
         // PUT: Update role text
-        put("/roles/{id}") {
+        put("/api/roles/{id}") {
             val user = principalUser()
             if (user == null) {
                 call.respond(HttpStatusCode.BadRequest, "Invalid user")
@@ -126,7 +126,7 @@ fun Application.configureRoles() = routing {
         }
 
         // DELETE: Delete role
-        delete("/roles/{id}") {
+        delete("/api/roles/{id}") {
             val user = principalUser()
             if (user == null) {
                 call.respond(HttpStatusCode.BadRequest, "Invalid user")

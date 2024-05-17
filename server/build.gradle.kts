@@ -8,7 +8,7 @@ group = "ru.deltadelete.netial"
 version = "0.0.1"
 
 application {
-    mainClass.set("ru.deltadelete.netial.ApplicationKt")
+    mainClass = "ru.deltadelete.netial.ApplicationKt"
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
@@ -41,9 +41,43 @@ dependencies {
     implementation(libs.jbcrypt)
     implementation(libs.logback.classic)
     implementation(libs.jakarta.mail)
-    
+
     testImplementation(libs.ktor.server.tests)
     testImplementation(libs.kotlin.test.junit)
     testImplementation(libs.ktor.server.test.host.jvm)
     testImplementation(libs.kotlinx.coroutines.test)
+}
+
+distributions {
+    create("custom") {
+        val jarTask = tasks.getByPath(":netial-server:jar")
+        val clientBuild = tasks.getByPath(":client:pnpmBuild")
+        distributionBaseName = rootProject.name
+        contents {
+            from(jarTask.outputs.files) {
+                into("")
+            }
+            from(rootProject.file("config.example.json")) {
+                rename("config.example.json", "config.json")
+                into("")
+            }
+            from(rootProject.file("docs/confirmation.html")) {
+                into("templates")
+            }
+            from(clientBuild.outputs.files){
+                into("wwwroot")
+            }
+        }
+    }
+}
+
+tasks.withType<Jar> {
+    manifest {
+        attributes["Main-Class"] = application.mainClass
+    }
+}
+
+// Resolve duplicates
+tasks.withType<AbstractCopyTask> {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }

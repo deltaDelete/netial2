@@ -25,17 +25,17 @@ fun Application.configureUsers() = routing {
     // TODO: AVATARS
 
     // Create user
-    post("/users") {
+    post("/api/users") {
         createUser(userService)
     }
 
     // Register user
-    post("/register") {
+    post("/api/register") {
         createUser(userService)
     }
 
     // Get user info
-    get("/users/{id}") {
+    get("/api/users/{id}") {
         val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
         val user = userService.read(id)
         if (user != null) {
@@ -49,7 +49,7 @@ fun Application.configureUsers() = routing {
     }
 
     // GET: Get list of roles for user
-    get("/users/{id}/roles") {
+    get("/api/users/{id}/roles") {
         val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
         val roles = dbQuery {
             User.findById(id)?.roles?.map {
@@ -60,7 +60,7 @@ fun Application.configureUsers() = routing {
     }
 
     // Get list of users
-    get("/users") {
+    get("/api/users") {
         val page = call.request.queryParameters["page"]?.toLong() ?: 1L
         val pageSize = call.request.queryParameters["pageSize"]?.toInt() ?: 10
         val users = userService.readAll(page, pageSize)
@@ -68,7 +68,7 @@ fun Application.configureUsers() = routing {
     }
 
     // GET: Confirm email
-    get("/users/{id}/confirm") {
+    get("/api/users/{id}/confirm") {
         val token = call.request.queryParameters["token"] ?: throw IllegalArgumentException("Invalid token")
         val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
 
@@ -88,7 +88,7 @@ fun Application.configureUsers() = routing {
     authenticate("auth-jwt", strategy = AuthenticationStrategy.FirstSuccessful) {
 
         // Update user
-        put("/users/{id}") {
+        put("/api/users/{id}") {
             val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
             val user = principalUser()
 
@@ -109,7 +109,7 @@ fun Application.configureUsers() = routing {
         }
 
         // Delete user
-        delete("/users/{id}") {
+        delete("/api/users/{id}") {
             val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
             val user = principalUser()
 
