@@ -89,20 +89,17 @@ CREATE
 AS
 $$
 BEGIN
-    IF
-        tg_op == 'DELETE' THEN
-        UPDATE posts
-        SET comments = GREATEST(comments - 1, 0)
-        WHERE id = old.post_id;
-        RETURN old;
-    ELSE
-        IF NEW.is_deleted == 1 THEN
-            UPDATE posts
-            SET comments = GREATEST(comments - 1, 0)
-            WHERE id = new.post_id;
-        END IF;
-        RETURN new;
-    END IF;
+    CASE
+        WHEN tg_op = 'DELETE' THEN UPDATE posts
+                                   SET comments = GREATEST(comments - 1, 0)
+                                   WHERE id = old.post_id;
+                                   RETURN old;
+        WHEN NEW.is_deleted THEN UPDATE posts
+                                 SET comments = GREATEST(comments - 1, 0)
+                                 WHERE id = new.post_id;
+                                 RETURN new;
+        ELSE RETURN new;
+        END CASE;
 END;
 $$;
 CREATE TRIGGER removeCommentTrigger
@@ -153,7 +150,7 @@ CREATE TABLE messages
     user_id       BIGINT    NOT NULL REFERENCES users (id),
     user_to_id    bigint    NULL REFERENCES users (id),
     group_to_id   bigint    NULL REFERENCES message_groups (id),
-    reply_to_id      bigint    NULL REFERENCES messages (id)
+    reply_to_id   bigint    NULL REFERENCES messages (id)
 );
 
 CREATE TABLE messages_attachments
