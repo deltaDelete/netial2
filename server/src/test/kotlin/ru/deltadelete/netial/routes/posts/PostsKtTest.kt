@@ -9,6 +9,7 @@ import ru.deltadelete.netial.module
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class PostsKtTest {
 
@@ -17,9 +18,11 @@ class PostsKtTest {
         application {
             module()
         }
-        client.get("/posts").apply {
+        client.get("/api/posts?page=2&pageSize=10").apply {
             assertEquals(HttpStatusCode.OK, status, "Unexpected status code")
-            assertNotNull(body<List<PostDto>>(), "Unexpected body")
+            val body = body<List<PostDto>>()
+            assertNotNull(body, "Unexpected body")
+            assertTrue { body.size <= 10 } }
         }
     }
 }

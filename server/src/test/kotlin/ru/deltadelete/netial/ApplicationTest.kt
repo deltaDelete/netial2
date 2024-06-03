@@ -18,8 +18,12 @@ import ru.deltadelete.netial.database.schemas.Permission
 import ru.deltadelete.netial.plugins.configureDatabases
 import ru.deltadelete.netial.plugins.configureSecurity
 import ru.deltadelete.netial.plugins.configureSerialization
+import ru.deltadelete.netial.plugins.loadConfig
 import ru.deltadelete.netial.routes.users.configureUsers
-import ru.deltadelete.netial.utils.*
+import ru.deltadelete.netial.utils.Mail
+import ru.deltadelete.netial.utils.dbQuery
+import ru.deltadelete.netial.utils.formatTemplate
+import ru.deltadelete.netial.utils.newJsonMapper
 import java.util.*
 import kotlin.test.*
 
@@ -28,6 +32,7 @@ class ApplicationTest {
     @Test
     fun testDatabase() = testApplication {
         application {
+            loadConfig()
             configureDatabases()
             assertNotNull(TransactionManager.defaultDatabase)
         }
@@ -37,6 +42,7 @@ class ApplicationTest {
     fun testUsersGet() = testApplication {
         val mapper = newJsonMapper()
         application {
+            loadConfig()
             configureDatabases()
             configureSecurity()
             configureSerialization()
@@ -59,6 +65,7 @@ class ApplicationTest {
     @Test
     fun testUsersSchemaRoles() = testApplication {
         application {
+            loadConfig()
             configureDatabases()
             transaction {
                 assertTrue {
@@ -74,6 +81,7 @@ class ApplicationTest {
     @Test
     fun testSendConfirmationEmail() = testApplication {
         application {
+            loadConfig()
             configureDatabases()
             runTest {
                 dbQuery {
@@ -90,6 +98,7 @@ class ApplicationTest {
         val code = ""
 
         application {
+            loadConfig()
             configureDatabases()
             runTest {
                 dbQuery {
