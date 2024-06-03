@@ -61,7 +61,7 @@ export default function Register() {
     };
 
     return (
-        <div class="container">
+        <div class="container root-container">
             <h1 class="text-2xl text-center heading uppercase">Регистрация</h1>
             <form onSubmit={onSubmit} class="gap-4 flex flex-col">
                 <Input label="Логин" type={"text"} name="username" required onChange={setUsename} valid={hasError()} />

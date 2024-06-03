@@ -1,5 +1,5 @@
-import { createSignal, Signal } from "solid-js";
-import user from "@/types/User";
+import role from "@/types/Role";
+import ApiClient from "@/utils/ApiClient";
 
 export default class AuthManager {
     private static _instance?: AuthManager;
@@ -34,6 +34,19 @@ export default class AuthManager {
         localStorage.setItem("token", token);
     }
 
+    public get roles(): role[] {
+        const data = localStorage.getItem("roles");
+        return data ? JSON.parse(data) : [];
+    }
+
+    public set roles(roles: role[] | undefined) {
+        if (!roles || roles.length < 1) {
+            localStorage.removeItem("roles");
+            return;
+        }
+        localStorage.setItem("roles", JSON.stringify(roles));
+    }
+
     /**
      * Authorizes the user with the provided login credentials.
      *
@@ -60,6 +73,7 @@ export default class AuthManager {
             return { result: AuthResult.Error, response: token };
         }
         this.token = token.token;
+        this.roles = this.user && await ApiClient.instance.users.getRoles(this.user.sub);
 
         return { result: AuthResult.Success, response: token };
     }
@@ -71,6 +85,7 @@ export default class AuthManager {
      */
     public logout() {
         this.token = undefined;
+        this.roles = undefined;
     }
 
     /**

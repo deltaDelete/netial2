@@ -5,7 +5,7 @@
 .dialog__positioner {
     @apply fixed inset-0 flex items-center justify-center;
     & .dialog__content {
-        @apply flex flex-col items-stretch gap-4 justify-center max-sm:min-w-[90dvw] sm:min-w-[50dvw] lg:min-w-[30dvw];
+        @apply flex flex-col items-stretch gap-4 justify-center w-fit max-sm:min-w-[90dvw] sm:min-w-[50dvw] lg:min-w-[30dvw];
         transform-origin: center center;
         animation: contentHide 100ms ease-in forwards;
         &[data-expanded] {

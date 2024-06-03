@@ -11,7 +11,7 @@ export function AccountComponent() {
     const id = () => user()?.sub;
     console.log(id());
     const [userRemote] = createResource<User, number>(id, async (k: number) => {
-        return await ApiClient.instance.users.getUser(k);
+        return await ApiClient.instance.users.get(k);
     });
     return (
         <Show when={userRemote()}>
@@ -39,7 +39,7 @@ export function AccountComponent() {
 export default function UserComponent(props: UserComponentProps) {
     const id = () => props.id;
     const [user] = createResource<User, number>(id, async (k: number) => {
-        return await ApiClient.instance.users.getUser(k);
+        return await ApiClient.instance.users.get(k);
     }, {
         initialValue: props.user,
         ssrLoadFrom: "initial"

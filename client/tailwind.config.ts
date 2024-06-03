@@ -16,13 +16,15 @@ export default {
         serif: ['Noto Serif Display', 'Georgia', 'Cambria', 'Times New Roman', 'Times', 'serif'],
         heading: ['Montserrat'],
         mono: ['Fragment Mono', 'Menlo', 'Monaco', 'Consolas', 'Courier New',
-          'monospace']
+          'monospace'],
+        symbols: ["Material Symbols Rounded"]
       },
       colors: {
         // GNOME 40 like colors
         container: "#404040",
         background: "#282828",
         primary: "#F9F9F9",
+        onPrimary: "#090909",
         secondary: "#C0C0C0",
         error: "rgb(239 68 68)"
       }

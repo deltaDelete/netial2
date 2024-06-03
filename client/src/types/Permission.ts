@@ -1,0 +1,41 @@
+export enum Permission {
+    // ROLE
+    CREATE_ROLE = 1 << 0,
+    MODIFY_ROLE = 1 << 1,
+    REMOVE_ROLE = 1 << 2,
+    // GROUP
+    CREATE_GROUP = 1 << 3,
+    MODIFY_GROUP = 1 << 4,
+    REMOVE_GROUP = 1 << 5,
+    // POST
+    CREATE_POST = 1 << 6,
+    MODIFY_POST = 1 << 7,
+    REMOVE_POST = 1 << 8,
+    // COMMENT
+    CREATE_COMMENT = 1 << 9,
+    MODIFY_COMMENT = 1 << 10,
+    REMOVE_COMMENT = 1 << 11,
+    // USER
+    CREATE_USER = 1 << 12,
+    REMOVE_USER = 1 << 13,
+    MODIFY_USER = 1 << 14,
+    // SELF REMOVE
+    SELF_REMOVE_POST = 1 << 15,
+    SELF_REMOVE_COMMENT = 1 << 16,
+    SELF_REMOVE_USER = 1 << 17,
+    // SELF MODIFY
+    SELF_MODIFY_USER = 1 << 18,
+    SELF_MODIFY_POST = 1 << 19,
+    SELF_MODIFY_COMMENT = 1 << 20,
+    // SELF CREATE
+    SELF_CREATE_POST = 1 << 21,
+    SELF_CREATE_COMMENT = 1 << 22,
+    // ATTACHMENT
+    CREATE_ATTACHMENT = 1 << 23,
+    MODIFY_ATTACHMENT = 1 << 24,
+    REMOVE_ATTACHMENT = 1 << 25,
+    // SELF ATTACHMENT
+    SELF_CREATE_ATTACHMENT = 1 << 26,
+    SELF_MODIFY_ATTACHMENT = 1 << 27,
+    SELF_REMOVE_ATTACHMENT = 1 << 28
+}

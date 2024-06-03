@@ -1,0 +1,138 @@
+a:has(.header) {
+    @apply decoration-0 text-inherit ms-4 font-semibold font-heading;
+
+    & h1 {
+        @apply text-3xl;
+    }
+
+    & h2 {
+        @apply text-2xl;
+    }
+
+    & h3 {
+        @apply text-xl;
+    }
+
+    & h4 {
+        @apply text-lg;
+    }
+
+    & h5 {
+        @apply text-base;
+    }
+
+    & h6 {
+        @apply text-sm;
+    }
+}
+
+.list-inside {
+    @apply self-start;
+}
+
+article.markdown {
+    @apply flex flex-col gap-4;
+
+    & > p {
+        &:has(img) {
+            @apply self-center;
+
+            & img {
+                @apply rounded-xl border border-white/20 shadow-lg p-0;
+            }
+        }
+    }
+
+    & ol {
+        @apply list-decimal list-inside p-4;
+    }
+
+    & ul {
+        @apply list-disc list-inside p-4;
+    }
+
+    & .link {
+        @apply text-blue-500 decoration-1 underline;
+    }
+
+    li.checked {
+        &::before {
+            content: "\e834";
+            font-variation-settings: "FILL" 1,
+            "wght" 400,
+            "GRAD" 0,
+            "opsz" 24;
+            @apply me-2 font-symbols align-bottom;
+        }
+
+        &::marker {
+            content: "";
+        }
+    }
+
+    li.unchecked {
+        &::before {
+            content: "\e835";
+            font-variation-settings: "FILL" 1,
+            "wght" 400,
+            "GRAD" 0,
+            "opsz" 24;
+            @apply me-2 font-symbols align-bottom;
+        }
+
+        &::marker {
+            content: "";
+        }
+    }
+
+    & blockquote {
+        @apply border-s-blue-500/50 border-s-[0.75rem] rounded-xl border border-white/20 p-4 bg-black/20;
+    }
+
+    & div.code {
+        @apply p-0 rounded-md text-white whitespace-pre font-mono text-sm overflow-clip;
+
+        & > pre {
+            @apply px-4 py-2 rounded-xl border border-white/20 overflow-x-auto overflow-y-clip scroll-m-4;
+
+            & code {
+                counter-reset: step;
+                counter-increment: step 0;
+                @apply relative flex flex-col z-0;
+
+                &::before {
+                    content: " ";
+                    @apply bg-black/20 w-10 top-0 bottom-0 m-[-1rem] absolute;
+                }
+
+                & .line::before {
+                    content: counter(step);
+                    counter-increment: step;
+                    @apply pe-4 ps-2 inline-block text-right;
+                }
+
+                & .line {
+                    @apply active:bg-black/20 selection:bg-blue-900/50;
+                }
+            }
+        }
+    }
+
+    & p:has(a) {
+        @apply self-start;
+
+        & a {
+            @apply inline-block;
+        }
+    }
+
+    & p:has(code) {
+        & code {
+            @apply p-1 bg-gray-700/20 rounded;
+        }
+    }
+
+    & .attachment {
+        @apply flex flex-row max-w-fit bg-container p-4 border border-white border-opacity-20 self-start rounded text-white hover:text-white hover:bg-slate-500;
+    }
+}

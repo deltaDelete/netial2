@@ -1,0 +1,21 @@
+.__pagination_root > ul {
+    @apply flex flex-row gap-2 place-content-center place-items-stretch;
+}
+
+.__pagination_item {
+    @apply bg-secondary flex flex-row basis-1 place-content-center place-items-center p-4 rounded-2xl text-black font-bold
+    text-sm font-heading hover:bg-primary/50 hover:text-black/50 cursor-pointer active:scale-[.99] transition
+    max-sm:text-wrap uppercase min-w-fit overflow-hidden md:p-2 md:rounded-xl md:text-sm;
+
+    &:disabled {
+        @apply bg-transparent text-white/20 border border-white border-opacity-20 rounded-2xl;
+    }
+
+    &[data-current] {
+        @apply bg-primary;
+    }
+}
+
+.__pagination_ellipsis {
+    @apply h-full text-center flex place-items-center;
+}

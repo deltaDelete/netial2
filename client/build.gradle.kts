@@ -4,6 +4,10 @@ plugins {
     alias(libs.plugins.node.gradle)
 }
 
+node {
+    npmVersion = "18.20.2"
+}
+
 tasks.register<PnpmTask>("pnpmDev") {
     dependsOn(tasks.pnpmInstall)
     pnpmDev()

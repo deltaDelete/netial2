@@ -1,4 +1,4 @@
-import { createResource, For, Show } from "solid-js";
+import { createResource, createSignal, For, mapArray, Show } from "solid-js";
 import ApiClient from "@/utils/ApiClient";
 import { Loading } from "@components/Loading";
 import PostComponent from "@components/PostComponent";
@@ -13,14 +13,14 @@ export default function Posts() {
     const location = useLocation<{ post: Post }>();
 
     const [post] = createResource(id, async (k: number) => {
-        return await ApiClient.instance.posts.getPost(k);
+        return await ApiClient.instance.posts.get(k);
     }, {
         ssrLoadFrom: "initial",
         initialValue: location.state?.post
     });
 
     return (
-        <div class="flex flex-col gap-4">
+        <div class="flex flex-col gap-4 items-center">
             <Show when={!post.loading} fallback={Loading()}>
                 <PostComponent value={post()!}>
                     <PostComments />
@@ -39,9 +39,24 @@ function PostComments() {
     }, {
         initialValue: getComments()
     });
+    const commentsArray = mapArray(comments, (value) => {
+        const [text, setText] = createSignal(value.text);
+        return {
+            id: value.id,
+            user: value.user,
+            creationDate: value.creationDate,
+            isDeleted: value.isDeleted,
+            deletionDate: value.deletionDate,
+            postId: value.postId,
+            get text() {
+                return text();
+            },
+            setText
+        };
+    });
     return (
         <Show when={!comments.loading} fallback={Loading()}>
-            <For each={getComments()}>{(item, index) =>
+            <For each={commentsArray()}>{(item, index) =>
                 <CommentComponent value={item} />
             }</For>
         </Show>

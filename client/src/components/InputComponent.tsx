@@ -11,10 +11,10 @@ function Input(props: InputComponentProps) {
             </Show>
             <Switch>
                 <Match when={props.multiline}>
-                    <TextField.TextArea class="text-input-input" autoResize={true}/>
+                    <TextField.TextArea class="text-input-input" autoResize={true} value={props.value}/>
                 </Match>
                 <Match when={!props.multiline}>
-                    <TextField.Input type={props.type} class="text-input-input" />
+                    <TextField.Input type={props.type} class="text-input-input" value={props.value} />
                 </Match>
             </Switch>
             <Show when={props.error}>
@@ -32,7 +32,8 @@ export type InputComponentProps = {
     valid?: "valid" | "invalid",
     error?: string,
     multiline?: boolean,
-    name: string
+    name: string,
+    value?: string | string[] | number,
 }
 
 export default Input;

@@ -12,23 +12,26 @@ import Input from "@components/InputComponent";
 import { PostContextProvider, usePostContext } from "@/utils/PostContext";
 import { Comment, CommentRequest } from "@/types/Comment";
 import { Button } from "@kobalte/core/button";
+import Markdoc from "@/markdoc/Markdoc";
+import { createResource } from "solid-js";
 
 export default function PostComponent(props: PostComponentProps) {
     const navigate = useNavigate();
     const [user] = useAuthContext();
 
-    const [dialogOpen, setDialogOpen] = createSignal<boolean>(false)
+    const [dialogOpen, setDialogOpen] = createSignal<boolean>(false);
 
     return (
         <PostContextProvider post={props.value}>
-            <div class="post">
+            <div class="post self-stretch">
                 <div class="post-text"
                      onClick={() => props.navigatable && navigate(`/posts/${props.value.id}`, { state: { post: props.value } })}
                      classList={{
-                         "cursor-pointer": props.navigatable
+                         "cursor-pointer": props.navigatable,
+                         "max-h-[10rem] overflow-clip": props.navigatable,
                      }}
                 >
-                    <FormattedText text={props.value.text} />
+                    <Markdoc content={props.value.text} />
                 </div>
                 <div class="text-end flex flex-row justify-between content-center text-white/50">
                     <UserComponent user={props.value.user} reverse />
@@ -36,16 +39,13 @@ export default function PostComponent(props: PostComponentProps) {
                 </div>
                 <div class="flex flex-row gap-1">
                     <div class="button-group">
-                        <Button disabled={!user()} class="button secondary small grow">
-                            Нравится
-                            <div class="counter">{props.value.likes}</div>
-                        </Button>
+                        <LikeButton />
                         <DialogComponent
                             trigger={<>
                                 Комментарии
                                 <div class="counter">{props.value.comments}</div>
                             </>
-                        }
+                            }
                             triggerClass="button secondary small grow"
                             title="Новый комментарий"
                             disabled={!user()}
@@ -100,5 +100,39 @@ function NewComment(props: { onClose: () => void }) {
             <Input name="text" multiline onChange={setText} valid={isValid()} required label="Текст комментария" />
             <button class="button" type="submit">Опубликовать</button>
         </form>
+    );
+}
+
+function LikeButton() {
+    const [user] = useAuthContext();
+    const [[post, setPost], [comments, setComments]] = usePostContext();
+    const [likes, setLikes] = createSignal(post().likes);
+
+    const onLikeClick = async () => {
+        const currentPost = post();
+        if (!currentPost.id) {
+            return;
+        }
+        const likesResponse = await ApiClient.instance.posts.like(currentPost.id);
+        if (likesResponse.id != currentPost.id) {
+            return;
+        }
+        setLikes(likesResponse.likes);
+        mutate(true);
+    };
+
+    const [hasLike, { mutate, refetch }] = createResource(async () => {
+        return await ApiClient.instance.posts.hasLike(post().id!!);
+    });
+
+
+    return (
+        <Button disabled={!user()} class="button small grow" classList={{
+            "primary": hasLike(),
+            "secondary": !hasLike(),
+        }} onClick={onLikeClick}>
+            Нравится
+            <div class="counter">{likes()}</div>
+        </Button>
     );
 }

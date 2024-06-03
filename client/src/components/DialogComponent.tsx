@@ -1,6 +1,7 @@
 import { JSX, Show } from "solid-js";
 import "./DialogComponent.css";
 import { Dialog, DialogRootProps } from "@kobalte/core/dialog";
+import Icon from "@/components/Icon"
 
 export default function DialogComponent(props: DialogComponentProps) {
     return (
@@ -16,7 +17,7 @@ export default function DialogComponent(props: DialogComponentProps) {
                             <Dialog.Title class="dialog__title">{props.title}</Dialog.Title>
                             <Dialog.CloseButton class="dialog__close button ghost"
                                                 onClick={() => props.onOpenChange?.call(undefined, false)}>
-                                X
+                                <Icon code={"\ue5cd"} size={"1.5rem"} />
                             </Dialog.CloseButton>
                         </div>
                         <Show when={props.description}>
@@ -33,7 +34,7 @@ export default function DialogComponent(props: DialogComponentProps) {
 }
 
 type DialogComponentProps = DialogRootProps & {
-    trigger: number | boolean | Node | JSX.ArrayElement | (string & {}) | null | undefined,
+    trigger?: number | boolean | Node | JSX.ArrayElement | (string & {}) | null,
     title: string,
     description?: string,
     disabled?: boolean,

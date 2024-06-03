@@ -1,0 +1,15 @@
+.checkbox {
+    @apply flex flex-row gap-2 items-center align-middle;
+
+    /* .checkbox__input .checkbox__control .checkbox__label .checkbox__description .checkbox__error .checkbox__indicator*/
+
+    & .checkbox__control {
+        @apply flex rounded-lg m-0 p-0 h-8 w-8 shrink-0 border border-primary shadow transition-shadow
+        focus-visible:outline-none focus-visible:ring-[1.5px] focus-visible:ring-white
+        data-[disabled]:cursor-not-allowed data-[checked]:bg-primary data-[disabled]:opacity-50;
+
+        & .checkbox__indicator {
+            @apply flex items-center basis-full justify-center text-current data-[checked]:text-onPrimary m-0 p-0 select-none;
+        }
+    }
+}
