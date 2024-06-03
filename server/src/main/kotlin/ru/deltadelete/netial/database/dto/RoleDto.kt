@@ -4,12 +4,11 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import ru.deltadelete.netial.database.dao.Role
 import ru.deltadelete.netial.database.schemas.Permission
-import java.util.*
 
 data class RoleDto(
     val name: String,
     val description: String = "",
-    val permissions: EnumSet<Permission> = EnumSet.noneOf(Permission::class.java),
+    val permissions: Long = 0,
     val isDeleted: Boolean = false,
     val creationDate: Instant = Clock.System.now(),
     val deletionDate: Instant? = null,
@@ -20,7 +19,7 @@ data class RoleDto(
             return RoleDto(
                 from.name,
                 from.description,
-                from.permissions,
+                from.permissions.fold(0) { acc: Long, permission: Permission -> acc or permission.value },
                 from.isDeleted,
                 from.creationDate,
                 from.deletionDate,

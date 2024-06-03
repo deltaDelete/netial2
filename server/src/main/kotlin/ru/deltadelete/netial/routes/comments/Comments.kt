@@ -120,22 +120,26 @@ fun Application.configureComments() = routing {
             val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
             val text = call.receiveText()
 
-            val comment = dbQuery { Comment.findById(id) }
+            val comment = dbQuery { Comment.findById(id)?.load(Comment::user) }
             if (comment == null) {
                 call.respond(HttpStatusCode.NotFound)
                 return@put
             }
 
-            user.checkPermission(Permission.MODIFY_COMMENT, Permission.SELF_MODIFY_COMMENT, user.id == comment.user.id) {
+            user.checkPermission(
+                Permission.MODIFY_COMMENT,
+                Permission.SELF_MODIFY_COMMENT,
+                user.id == comment.user.id
+            ) {
                 call.respond(HttpStatusCode.Forbidden, "You don't have permission to modify this comment")
                 return@put
             }
 
-            transaction {
+            dbQuery {
                 comment.text = text
             }
 
-            call.respond(HttpStatusCode.OK, CommentDto.from(comment))
+            call.respond(HttpStatusCode.OK, dbQuery { CommentDto.from(comment) })
         }
 
         // DELETE: Delete comment
@@ -153,7 +157,11 @@ fun Application.configureComments() = routing {
                 return@delete
             }
 
-            user.checkPermission(Permission.REMOVE_COMMENT, Permission.SELF_REMOVE_COMMENT, user.id == comment.user.id) {
+            user.checkPermission(
+                Permission.REMOVE_COMMENT,
+                Permission.SELF_REMOVE_COMMENT,
+                user.id == comment.user.id
+            ) {
                 call.respond(HttpStatusCode.Forbidden, "You don't have permission to delete this comment")
                 return@delete
             }

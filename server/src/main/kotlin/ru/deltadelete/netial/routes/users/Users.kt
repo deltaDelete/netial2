@@ -7,12 +7,14 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.pipeline.*
+import org.jetbrains.exposed.sql.and
 import ru.deltadelete.netial.database.dao.User
 import ru.deltadelete.netial.database.dao.UserService
 import ru.deltadelete.netial.database.dto.RoleDto
 import ru.deltadelete.netial.database.dto.UserDto
 import ru.deltadelete.netial.database.dto.UserRegister
 import ru.deltadelete.netial.database.schemas.Permission
+import ru.deltadelete.netial.database.schemas.Users
 import ru.deltadelete.netial.utils.checkPermission
 import ru.deltadelete.netial.utils.dbQuery
 import ru.deltadelete.netial.utils.principalUser
@@ -65,6 +67,16 @@ fun Application.configureUsers() = routing {
         val pageSize = call.request.queryParameters["pageSize"]?.toInt() ?: 10
         val users = userService.readAll(page, pageSize)
         call.respond(HttpStatusCode.OK, users)
+    }
+
+    get("/api/users/pages") {
+        val pageSize = call.request.queryParameters["pageSize"]?.toInt() ?: 10
+        val total = dbQuery {
+            User.find { (Users.deletionDate eq null) and (Users.isDeleted eq false) }
+                .count()
+        }
+        val pages = (total + pageSize - 1) / pageSize
+        call.respond(HttpStatusCode.OK, pages)
     }
 
     // GET: Confirm email

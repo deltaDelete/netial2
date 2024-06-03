@@ -1,6 +1,7 @@
 package ru.deltadelete.netial.utils
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.module.SimpleModule
@@ -14,6 +15,7 @@ import io.ktor.util.pipeline.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.datetime.Instant
+import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.mindrot.jbcrypt.BCrypt
 import ru.deltadelete.netial.database.dao.User
@@ -35,7 +37,7 @@ suspend fun DefaultWebSocketServerSession.principalUser(): User? = dbQuery {
     }
 }
 
-suspend fun <T> dbQuery(block: suspend () -> T): T =
+suspend fun <T> dbQuery(block: suspend Transaction.() -> T): T =
     newSuspendedTransaction(Dispatchers.IO) { block() }
 
 /**
@@ -69,12 +71,14 @@ suspend inline fun User.checkPermission(
     return true
 }
 
-inline fun User.hasPermission(
+suspend inline fun User.hasPermission(
     permission: Permission,
     block: () -> Unit,
 ): Boolean {
-    val hasPermission = roles.any {
-        it.permissions.contains(permission)
+    val hasPermission = dbQuery {
+        roles.any {
+            it.permissions.contains(permission)
+        }
     }
     if (hasPermission) {
         block()
@@ -82,12 +86,14 @@ inline fun User.hasPermission(
     return hasPermission
 }
 
-inline fun User.missingPermission(
+suspend inline fun User.missingPermission(
     permission: Permission,
     block: () -> Unit,
 ): Boolean {
-    val hasPermission = roles.any {
-        it.permissions.contains(permission)
+    val hasPermission = dbQuery {
+        roles.any {
+            it.permissions.contains(permission)
+        }
     }
     if (!hasPermission) {
         block()
@@ -136,6 +142,7 @@ fun newJsonMapper(): ObjectMapper = jacksonObjectMapper().configureJackson()
 
 fun ObjectMapper.configureJackson(): ObjectMapper = enable(SerializationFeature.INDENT_OUTPUT)
     .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
     .registerModule(
         SimpleModule()
             .addSerializer(Instant::class.java, InstantSerializer())

@@ -38,6 +38,16 @@ fun Application.configureRoles() = routing {
         call.respond(roles)
     }
 
+    get("/api/roles/pages") {
+        val pageSize = call.request.queryParameters["pageSize"]?.toInt() ?: 10
+        val total = dbQuery {
+            Role.find { (Roles.deletionDate eq null) and (Roles.isDeleted eq false) }
+                .count()
+        }
+        val pages = (total + pageSize - 1) / pageSize
+        call.respond(HttpStatusCode.OK, pages)
+    }
+
     // GET: Get list of users with role
     get("/api/roles/{id}/users") {
         val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
@@ -87,7 +97,7 @@ fun Application.configureRoles() = routing {
             val new = dbQuery {
                 Role.new {
                     name = role.name
-                    permissions = role.permissions
+                    permissions = Permission.fromBitMask(role.permissions)
                 }
             }
 
@@ -119,7 +129,7 @@ fun Application.configureRoles() = routing {
             transaction {
                 role.name = newRole.name
                 role.description = newRole.description
-                role.permissions = newRole.permissions
+                role.permissions = Permission.fromBitMask(newRole.permissions)
             }
 
             call.respond(HttpStatusCode.OK, RoleDto.from(role))
