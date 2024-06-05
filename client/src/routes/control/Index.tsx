@@ -1,5 +1,5 @@
 import { Tabs } from "@kobalte/core/tabs";
-import { createResource, createSignal, For, Show } from "solid-js";
+import { createResource, createSignal, For, Match, Show, Switch } from "solid-js";
 import ApiClient from "@/utils/ApiClient";
 import role from "@/types/Role";
 import { Button } from "@kobalte/core/button";
@@ -13,6 +13,8 @@ import { A, useLocation, useNavigate, useSearchParams } from "@solidjs/router";
 import post from "@/types/Post";
 import { useRouter } from "@solidjs/router/dist/routing";
 import { Fallback } from "@kobalte/core/image";
+import { createQuery, useQueryClient } from "@tanstack/solid-query";
+import Icon from "@components/Icon";
 
 export default function Index() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -21,7 +23,8 @@ export default function Index() {
         return <h1>404</h1>;
     }
     return (
-        <Tabs class="flex flex-col gap-4 self-stretch items-stretch" defaultValue={searchParams.tab} onChange={(value) => setSearchParams({tab: value})}>
+        <Tabs class="flex flex-col gap-4 self-stretch items-stretch" defaultValue={searchParams.tab}
+              onChange={(value) => setSearchParams({ tab: value })}>
             <Tabs.List class="flex max-sm:self-stretch self-center p-4 basis-full grow">
                 <Tabs.Trigger value="users">Пользователи</Tabs.Trigger>
                 <Tabs.Trigger value="roles">Роли</Tabs.Trigger>
@@ -47,23 +50,38 @@ export default function Index() {
 }
 
 function Users() {
-    const [pages] = createResource(async () => {
-        return await ApiClient.instance.users.totalPages();
-    }, { initialValue: 1 });
+    const queryClient = useQueryClient();
+    const pages = createQuery(() => ({
+        queryKey: ["usersPages"],
+        queryFn: async () => await ApiClient.instance.users.totalPages()
+    }));
     const [page, setPage] = createSignal(1);
-    const [users, {refetch}] = createResource(page, async (source) => {
-        return await ApiClient.instance.users.getAll(source);
-    });
+    const users = createQuery(() => ({
+        queryKey: ["users", page()],
+        queryFn: async () => {
+            return await ApiClient.instance.users.getAll(page());
+        }
+    }));
     return (
         <div class="flex flex-col gap-4">
-            <For each={users()}>{(item, index) => (
-                <User user={item} onDelete={() => item.id && ApiClient.instance.users.delete(item.id).then(value => {
-                    value.status == 204 && refetch()
-                })} />
-            )}</For>
-            <Show when={!pages.loading && pages() > 1}>
-                <PaginationComponent totalPages={pages()} page={page()} onPageChange={setPage} />
-            </Show>
+            <Switch>
+                <Match when={users.isLoading}>
+                    <Icon code={"\ue9d0"} size={"3rem"} class="animate-spin" />
+                </Match>
+                <Match when={users.isFetched}>
+                    <For each={users.data}>{(item, index) => (
+                        <User user={item}
+                              onDelete={() => item.id && ApiClient.instance.users.delete(item.id).then(value => {
+                                  value.status == 204 && queryClient.invalidateQueries({
+                                      queryKey: ["users", page()]
+                                  });
+                              })} />
+                    )}</For>
+                    <Show when={pages.isFetched && (pages.data! > 1)}>
+                        <PaginationComponent totalPages={pages.data!} page={page()} onPageChange={setPage} />
+                    </Show>
+                </Match>
+            </Switch>
         </div>
     );
 }
@@ -88,33 +106,47 @@ function User(props: { user: user, onDelete: (() => void) | undefined }) {
     );
 }
 
-// TODO: POSTS paging
 // TODO: REMOVE INDICATIONS
 // TODO: EDIT
 function Roles() {
-    const [pages] = createResource(async () => {
-        return await ApiClient.instance.roles.totalPages();
-    }, { initialValue: 1 });
+    const queryClient = useQueryClient();
+    const pages = createQuery(() => ({
+        queryKey: ["rolesPages"],
+        queryFn: async () => await ApiClient.instance.roles.totalPages()
+    }));
     const [page, setPage] = createSignal(1);
-    const [roles, {refetch}] = createResource(page, async (source) => {
-        return await ApiClient.instance.roles.getAll(source);
-    });
+    const roles = createQuery(() => ({
+        queryKey: ["roles", page()],
+        queryFn: async () => {
+            return await ApiClient.instance.roles.getAll(page());
+        }
+    }));
     return (
         <div class="flex flex-col gap-4 justify-items-center">
-            <For each={roles()}>{(item, index) => (
-                <Role role={item} onDelete={() => item.id && ApiClient.instance.roles.delete(item.id).then(value => {
-                        value.status == 204 && refetch()
-                    })} />
-            )}</For>
-            <Show when={!pages.loading && pages() > 1}>
-                <PaginationComponent totalPages={pages()} page={page()} onPageChange={setPage} />
-            </Show>
+            <Switch>
+                <Match when={roles.isLoading}>
+                    <Icon code={"\ue9d0"} size={"3rem"} class="animate-spin" />
+                </Match>
+                <Match when={roles.isFetched}>
+                    <For each={roles.data}>{(item, index) => (
+                        <Role role={item}
+                              onDelete={() => item.id && ApiClient.instance.roles.delete(item.id).then(value => {
+                                  value.status == 204 && queryClient.invalidateQueries({
+                                      queryKey: ["roles", page()]
+                                  });
+                              })} />
+                    )}</For>
+                    <Show when={pages.isFetched && pages.data! > 1}>
+                        <PaginationComponent totalPages={pages.data!} page={page()} onPageChange={setPage} />
+                    </Show>
+                </Match>
+            </Switch>
         </div>
     );
 }
 
 function Role(props: { role: role, onDelete: (() => void) | undefined }) {
-    const [_user, {hasPermission}, _roles] = useAuthContext();
+    const [_user, { hasPermission }, _roles] = useAuthContext();
     const navigate = useNavigate();
     const hasRemove = hasPermission(Permission.REMOVE_ROLE);
     const hasModify = hasPermission(Permission.MODIFY_ROLE);
@@ -124,36 +156,56 @@ function Role(props: { role: role, onDelete: (() => void) | undefined }) {
             <p>{props.role.name}</p>
             <div
                 class="flex flex-row max-sm:basis-full basis-1/2 flex-wrap max-sm:flex-grow max-sm:place-content-center place-content-end gap-1 self-center justify-self-end">
-                <Button class="button secondary small max-sm:basis-full" onClick={() => navigate(`/control/edit/role/${props.role.id}`, { state: { role: props.role } })} disabled={!hasModify()}>Изменить</Button>
-                <DeleteButton onConfirm={props.onDelete} disabled={!hasRemove()}/>
+                <Button class="button secondary small max-sm:basis-full"
+                        onClick={() => navigate(`/control/edit/role/${props.role.id}`, { state: { role: props.role } })}
+                        disabled={!hasModify()}>Изменить</Button>
+                <DeleteButton onConfirm={props.onDelete} disabled={!hasRemove()} />
             </div>
         </div>
     );
 }
+
 function Posts() {
-    const [pages] = createResource(async () => {
-        return await ApiClient.instance.posts.totalPages();
-    }, { initialValue: 1 });
+    const queryClient = useQueryClient();
+    const pages = createQuery(() => ({
+        queryKey: ["postsPages"],
+        queryFn: async () => await ApiClient.instance.posts.totalPages()
+    }));
     const [page, setPage] = createSignal(1);
-    const [posts, {refetch}] = createResource(page, async (source) => {
-        return await ApiClient.instance.posts.getAll(source);
-    });
+    const posts = createQuery(() => ({
+        queryKey: ["posts", page()],
+        queryFn: async () => {
+            return await ApiClient.instance.posts.getAll(page());
+        }
+    }));
     return (
         <div class="flex flex-col gap-4 justify-items-center">
-            <For each={posts()}>{(item, index) => (
-                <Post post={item} onDelete={() => item.id && ApiClient.instance.posts.delete(item.id).then(value => {
-                    value.status == 204 && refetch()
-                })} />
-            )}</For>
-            <Show when={!pages.loading && pages() > 1}>
-                <PaginationComponent totalPages={pages()} page={page()} onPageChange={setPage} />
-            </Show>
+            <Switch>
+                <Match when={posts.isLoading}>
+                    <Icon code={"\ue9d0"} size={"3rem"} class="animate-spin" />
+                </Match>
+
+                <Match when={posts.isFetched}>
+                    <For each={posts.data}>{(item, index) => (
+                        <Post post={item}
+                              onDelete={() => item.id && ApiClient.instance.posts.delete(item.id).then(value => {
+                                  value.status == 204 && queryClient.invalidateQueries({
+                                      queryKey: ["posts", page()]
+                                  });
+                              })} />
+                    )}</For>
+                    <Show when={pages.isFetched && pages.data! > 1}>
+                        <PaginationComponent totalPages={pages.data!} page={page()} onPageChange={setPage} />
+                    </Show>
+                </Match>
+
+            </Switch>
         </div>
     );
 }
 
 function Post(props: { post: post, onDelete: (() => void) | undefined }) {
-    const [_user, {hasPermission}, _roles] = useAuthContext();
+    const [_user, { hasPermission }, _roles] = useAuthContext();
     const hasRemove = hasPermission(Permission.REMOVE_POST);
     const hasModify = hasPermission(Permission.MODIFY_POST);
     console.log(props.post);
@@ -167,7 +219,7 @@ function Post(props: { post: post, onDelete: (() => void) | undefined }) {
             <div
                 class="flex flex-row max-sm:basis-full basis-1/2 flex-wrap max-sm:flex-grow max-sm:place-content-center place-content-end gap-1 self-center justify-self-end">
                 <Button class="button secondary small max-sm:basis-full" disabled={!hasModify()}>Изменить</Button>
-                <DeleteButton onConfirm={props.onDelete} disabled={!hasRemove()}/>
+                <DeleteButton onConfirm={props.onDelete} disabled={!hasRemove()} />
             </div>
         </div>
     );

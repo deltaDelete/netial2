@@ -2,6 +2,7 @@
 import { render } from "solid-js/web";
 
 import "@/index.css";
+import 'solid-devtools';
 import App from "@/App";
 import { Route, Router } from "@solidjs/router";
 import Index from "@routes/Index";
@@ -23,6 +24,7 @@ const Posts = lazy(() => import("@routes/posts/Posts"));
 const NewPost = lazy(() => import("@routes/posts/NewPost"));
 const Control = lazy(() => import("@routes/control/Index"));
 const ControlEditRole = lazy(() => import("@routes/control/edit/Role"));
+const Messages = lazy(() => import("@routes/messages/Index"));
 
 const numberMatchFilter: MatchFilters = {
     id: /^\d+$/
@@ -37,6 +39,7 @@ render(() => (
             <Route path="/control/edit/role/:id" component={ControlEditRole} matchFilters={numberMatchFilter} />
             <Route path="/posts/:id" component={Posts} matchFilters={numberMatchFilter} />
             <Route path="/posts" component={NewPost} />
+            <Route path="/messages" component={Messages} />
             <Route path="*404" component={() => <h1>404</h1>} />
             <Route path="/" component={Index} />
         </Router>

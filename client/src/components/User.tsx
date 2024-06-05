@@ -46,12 +46,12 @@ export default function UserComponent(props: UserComponentProps) {
     });
     return (
         <Show when={user()}>
-            <div class="flex gap-1 place-items-center" classList={{
+            <div class="flex gap-1 place-items-center text-inherit" classList={{
                 "text": props.reverse,
                 "text-start": props.reverse,
                 "flex-row": !props.reverse
             }}>
-                <A state={{ user: user() }} href={`/users/${user()!.id}`} class="text-xl button ghost small">{user()!.firstName} {user()!.lastName}</A>
+                <A state={{ user: user() }} href={`/users/${user()!.id}`} class="text-xl text-inherit button ghost small">{user()!.firstName} {user()!.lastName}</A>
             </div>
         </Show>
     );

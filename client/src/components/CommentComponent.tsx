@@ -47,7 +47,7 @@ export default function CommentComponent(props: CommentComponentProps) {
                                          onOpenChange={setDialogOpen}>
                             <ChangeComment comment={props.value}
                                            onClose={() => setDialogOpen(false)}
-                                           setComment={value => props.value.setText(value.text)} />
+                                           setComment={value => props.value.text = value.text} />
                         </DialogComponent>
                     </Show>
                 </div>
@@ -76,7 +76,8 @@ function ChangeComment(props: { onClose: () => void, comment: Comment, setCommen
 
     return (
         <form onSubmit={onSubmit} class="flex flex-col gap-4">
-            <Input name="text" multiline onChange={setText} value={text()} valid={isValid()} required label="Текст комментария" />
+            <Input name="text" multiline onChange={setText} value={text()} valid={isValid()} required
+                   label="Текст комментария" />
             <button class="button" type="submit">Опубликовать</button>
         </form>
     );
@@ -84,14 +85,5 @@ function ChangeComment(props: { onClose: () => void, comment: Comment, setCommen
 
 
 type CommentComponentProps = {
-    value: {
-        id: number | undefined
-        user: User
-        creationDate: number
-        isDeleted: boolean
-        deletionDate: number | undefined
-        postId: string
-        readonly text: string
-        setText: Setter<string>
-    },
+    value: Comment,
 }

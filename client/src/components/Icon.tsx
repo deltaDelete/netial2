@@ -1,10 +1,9 @@
-import { JSX, mergeProps } from "solid-js";
+import { splitProps } from "solid-js";
 
-export default function Icon(props: { code: string, size?: string }) {
-    const mergedProps = mergeProps(props, {
-        class: `font-symbols text-center align-middle`
-    });
+export default function Icon(props: { code: string, size?: string, class?: string }) {
+    const [picked, other] = splitProps(props, ["code", "size", "class"]);
+
     return (
-        <span {...mergedProps} style={{ "font-size": props.size }}>{props.code}</span>
+        <span {...other} class={"icon" + (picked.class ? " " + picked.class : "")} style={{ "font-size": picked.size }}>{picked.code}</span>
     );
 }

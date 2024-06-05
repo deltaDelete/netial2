@@ -14,6 +14,7 @@ import { Comment, CommentRequest } from "@/types/Comment";
 import { Button } from "@kobalte/core/button";
 import Markdoc from "@/markdoc/Markdoc";
 import { createResource } from "solid-js";
+import { createInfiniteQuery, createQuery, useQueryClient } from "@tanstack/solid-query";
 
 export default function PostComponent(props: PostComponentProps) {
     const navigate = useNavigate();
@@ -118,18 +119,20 @@ function LikeButton() {
             return;
         }
         setLikes(likesResponse.likes);
-        mutate(true);
+        hasLike.data = true;
     };
 
-    const [hasLike, { mutate, refetch }] = createResource(async () => {
-        return await ApiClient.instance.posts.hasLike(post().id!!);
-    });
+    const hasLike = createQuery(() => ({
+        queryKey: ["hasLike", post().id],
+        queryFn: async () => await ApiClient.instance.posts.hasLike(post().id!!),
+        enabled: !!post().id,
+    }));
 
 
     return (
         <Button disabled={!user()} class="button small grow" classList={{
-            "primary": hasLike(),
-            "secondary": !hasLike(),
+            "primary": hasLike.data,
+            "secondary": !hasLike.data,
         }} onClick={onLikeClick}>
             Нравится
             <div class="counter">{likes()}</div>

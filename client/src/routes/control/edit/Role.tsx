@@ -10,6 +10,7 @@ import { Permission } from "@/types/Permission";
 import { Checkbox } from "@kobalte/core/checkbox";
 import { Loading } from "@components/Loading";
 import CheckboxComponent from "@components/CheckboxComponent";
+import { createQuery } from "@tanstack/solid-query";
 
 export default function Role() {
     const params = useParams<{ id: string }>();
@@ -17,32 +18,26 @@ export default function Role() {
     const navigate = useNavigate();
     const location = useLocation<{ role: role }>();
 
-    const [role, { mutate }] = createResource(id, async (k: number) => {
-        return await ApiClient.instance.roles.get(k);
-    }, {
-        ssrLoadFrom: "initial",
-        initialValue: location.state?.role
-    });
+    const role = createQuery(() => ({
+        queryKey: ["role", id()],
+        queryFn: async () => await ApiClient.instance.roles.get(id()),
+        initialData: () => location.state?.role
+    }));
 
     const handlePermissionChange = (checked: boolean, permission: Permission) => {
-        mutate((prev) => {
-            if (!prev) return prev;
-            if (!checked) {
-                // Удаляем
-                prev.permissions = prev.permissions & ~permission;
-                console.log("New permission:", prev);
-                return prev;
-            }
-            // Добавляем
-            prev.permissions = prev.permissions | permission;
-            console.log("New permission:", prev);
-            return prev;
-        });
+        if (!role.data) return;
+        if (!checked) {
+            // Удаляем
+            role.data.permissions = role.data.permissions & ~permission;
+            return;
+        }
+        // Добавляем
+        role.data.permissions = role.data.permissions | permission;
     };
 
     const onSubmit = (e: Event) => {
         e.preventDefault();
-        role() && ApiClient.instance.roles.update(role()!).then(value => {
+        role.data && ApiClient.instance.roles.update(role.data).then(value => {
             navigate("/control?tab=roles");
         });
     };
@@ -50,18 +45,10 @@ export default function Role() {
     return (
         <div class="flex flex-col gap-4 self-stretch items-stretch">
             <form onSubmit={onSubmit} class="flex flex-col gap-4 container root-container">
-                <Show when={role.state == "ready"} fallback={<Loading />}>
+                <Show when={role.isFetched} fallback={<Loading />}>
 
-                    <Input name="name" type="text" multiline={false} onChange={value => mutate((prev) => {
-                        if (prev)
-                            prev.name = value;
-                        return prev;
-                    })} label="Название" value={role()?.name} />
-                    <Input name="description" type="text" multiline={false} onChange={value => mutate((prev) => {
-                        if (prev)
-                            prev.description = value;
-                        return prev;
-                    })} label="Описание" value={role()?.description} />
+                    <Input name="name" type="text" multiline={false} onChange={value => (role.data && (role.data.name = value))} label="Название" value={role.data!.name} />
+                    <Input name="description" type="text" multiline={false} onChange={value => role.data && (role.data.description = value)} label="Описание" value={role.data!.description} />
 
                     <ul class="flex max-sm:flex-col flex-row gap-1 flex-wrap">
                         <For
@@ -71,7 +58,7 @@ export default function Role() {
                                 {/*       checked={(role()!.permissions & item) == item}*/}
                                 {/*       onChange={() => handlePermissionChange(item)} />*/}
                                 {/*<span>{Permission[item]}</span>*/}
-                                <CheckboxComponent defaultChecked={(role()!.permissions & item) == item}
+                                <CheckboxComponent defaultChecked={(role.data!.permissions & item) == item}
                                                    label={Permission[item]}
                                                    onChange={(checked) => handlePermissionChange(checked, item)}
                                                    id={`permission-${Permission[item]}`} />

@@ -1,9 +1,12 @@
-export function Navigation() {
+import { AnchorProps } from "@solidjs/router";
+
+export function Navigation(): AnchorProps[] {
     return [
         {
             href: "/",
             class: "button navigation",
-            children: "Главная"
+            children: "Главная",
+            end: true
         },
         {
             href: "/profile",
@@ -14,6 +17,6 @@ export function Navigation() {
             href: "/messages",
             class: "button navigation",
             children: "Сообщения"
-        },
+        }
     ];
 }

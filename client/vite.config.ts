@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
 import { dirname, resolve } from "node:path";
-// import devtools from 'solid-devtools/vite';
+import devtools from 'solid-devtools/vite';
 
 import { fileURLToPath } from "node:url";
 
@@ -10,7 +10,10 @@ const __dirname = dirname(__filename);
 
 export default defineConfig({
   plugins: [
-    // devtools(),
+    devtools({
+      /* features options - all disabled by default */
+      autoname: true, // e.g. enable autoname
+    }),
     solidPlugin(),
   ],
   server: {

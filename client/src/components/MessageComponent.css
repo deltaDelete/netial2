@@ -1,0 +1,11 @@
+.message {
+    @apply p-4 rounded-xl flex flex-col gap-2;
+
+    &.incoming {
+        @apply bg-container/20 text-white self-start;
+    }
+
+    &.outgoing {
+        @apply bg-primary/20 text-white self-end;
+    }
+}
