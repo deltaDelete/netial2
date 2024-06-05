@@ -7,10 +7,6 @@
     {
       "source": "/api/:path*",
       "destination": "https://dev.deltadelete.ru/api/:path*"
-    },
-    {
-      "source": "^(?!\\/api).*$",
-      "destination": "/"
     }
   ]
 }
