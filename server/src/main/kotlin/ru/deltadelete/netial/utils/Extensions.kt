@@ -31,12 +31,6 @@ suspend fun PipelineContext<Unit, ApplicationCall>.principalUser() = dbQuery {
     }
 }
 
-suspend fun DefaultWebSocketServerSession.principalUser(): User? = dbQuery {
-    call.authentication.principal<JWTPrincipal>()?.subject?.toLong()?.let {
-        return@let User.findById(it)
-    }
-}
-
 suspend fun <T> dbQuery(block: suspend Transaction.() -> T): T =
     newSuspendedTransaction(Dispatchers.IO) { block() }
 

@@ -1,7 +1,11 @@
 package ru.deltadelete.netial.plugins
 
 import com.auth0.jwt.JWT
+import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.exceptions.JWTDecodeException
+import com.auth0.jwt.exceptions.JWTVerificationException
+import com.auth0.jwt.impl.JWTParser
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
@@ -18,6 +22,7 @@ import ru.deltadelete.netial.database.dao.User
 import ru.deltadelete.netial.database.dao.findByUserName
 import ru.deltadelete.netial.types.Error
 import ru.deltadelete.netial.utils.Config
+import java.util.*
 import kotlin.time.Duration.Companion.days
 
 fun Application.configureSecurity() {
@@ -29,24 +34,10 @@ fun Application.configureSecurity() {
         jwt("auth-jwt") {
             realm = jwtRealm
             verifier(
-                JWT
-                    .require(Algorithm.HMAC256(jwtSecret))
-                    .withAudience(jwtAudience)
-                    .withIssuer(jwtDomain)
-                    .withClaimPresence("userName")
-                    .acceptLeeway(3600)
-                    .build()
+                jwtVerifier(jwtSecret, jwtAudience, jwtDomain)
             )
             validate { credential ->
-                val hasSubject = !credential.payload.subject.isNullOrBlank()
-                val hasAudience = credential.payload.audience.contains(jwtAudience)
-                val hasExpired = Clock.System.now().toJavaInstant().isAfter(credential.payload.expiresAt?.toInstant())
-
-                if (hasSubject && hasAudience && !hasExpired) {
-                    JWTPrincipal(credential.payload)
-                } else {
-                    null
-                }
+                validate(credential, jwtAudience)
             }
         }
     }
@@ -118,6 +109,47 @@ fun Application.configureSecurity() {
                 }
             }
         }
+    }
+}
+
+fun jwtVerifier(
+    jwtSecret: String,
+    jwtAudience: String,
+    jwtDomain: String,
+): JWTVerifier = JWT
+    .require(Algorithm.HMAC256(jwtSecret))
+    .withAudience(jwtAudience)
+    .withIssuer(jwtDomain)
+    .withClaimPresence("userName")
+    .acceptLeeway(3600)
+    .build()
+
+fun validate(
+    credential: JWTCredential,
+    jwtAudience: String,
+): JWTPrincipal? {
+    val hasSubject = !credential.payload.subject.isNullOrBlank()
+    val hasAudience = credential.payload.audience.contains(jwtAudience)
+    val hasExpired = Clock.System.now().toJavaInstant().isAfter(credential.payload.expiresAt?.toInstant())
+
+    return if (hasSubject && hasAudience && !hasExpired) {
+        JWTPrincipal(credential.payload)
+    } else {
+        null
+    }
+}
+
+fun authorize(token: String): JWTPrincipal?? {
+    try {
+        val verify = jwtVerifier(Config.jwt.jwtSecret, Config.jwt.jwtAudience, Config.jwt.jwtDomain).verify(token)
+        val jwtParser = JWTParser()
+        val payload = jwtParser.parsePayload(Base64.getDecoder().decode(verify.payload).toString(Charsets.UTF_8))
+        val credential = JWTCredential(payload)
+        return validate(credential, Config.jwt.jwtAudience)
+    } catch (e: JWTVerificationException) {
+        return null
+    } catch (e: JWTDecodeException) {
+        return null
     }
 }
 

@@ -3,7 +3,6 @@ package ru.deltadelete.netial.plugins
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.ktor.serialization.jackson.*
 import io.ktor.server.application.*
-import io.ktor.server.auth.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
@@ -13,10 +12,10 @@ import ru.deltadelete.netial.database.dao.Message
 import ru.deltadelete.netial.database.dao.MessageGroup
 import ru.deltadelete.netial.database.dao.User
 import ru.deltadelete.netial.database.dto.MessageDto
+import ru.deltadelete.netial.database.dto.WebSocketMessage
 import ru.deltadelete.netial.utils.dbQuery
 import ru.deltadelete.netial.utils.jsonMapper
 import ru.deltadelete.netial.utils.newJsonMapper
-import ru.deltadelete.netial.utils.principalUser
 import java.time.Duration
 
 fun Application.configureSockets() {
@@ -28,35 +27,46 @@ fun Application.configureSockets() {
         contentConverter = JacksonWebsocketContentConverter(newJsonMapper())
     }
     routing {
-        val sessions = mutableMapOf<Long,  WebSocketServerSession>()
-        authenticate("auth-jwt") {
-            webSocket("/api/ws") {
-                val user = principalUser()
-                if (user == null) {
-                    close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "Unauthorized"))
-                    return@webSocket
-                }
-                sessions[user.id.value] = this
-
-                try {
-                    for (frame in incoming) {
-                        if (frame is Frame.Text) {
-                            onTextMessage(frame, sessions)
-                        }
+        val sessions = mutableMapOf<DefaultWebSocketServerSession, Long>()
+        webSocket("/api/ws") {
+            try {
+                for (frame in incoming) {
+                    if (frame is Frame.Text) {
+                        onTextMessage(frame, sessions)
                     }
-                } catch (e: ClosedReceiveChannelException) {
-                    sessions.remove(user.id.value)
-                } catch (e: Throwable) {
-                    sessions.remove(user.id.value)
                 }
+            } catch (e: ClosedReceiveChannelException) {
+                sessions.remove(this)
+            } catch (e: Throwable) {
+                sessions.remove(this)
+                throw e
+            } finally {
+                sessions.remove(this)
             }
         }
     }
 }
 
-suspend fun DefaultWebSocketServerSession.onTextMessage(frame: Frame.Text, sessions: Map<Long,  WebSocketServerSession>) {
+suspend fun DefaultWebSocketServerSession.onTextMessage(
+    frame: Frame.Text,
+    sessions: MutableMap<DefaultWebSocketServerSession, Long>,
+) {
     // TODO loading previous messages
-    val incoming = jsonMapper.readValue<MessageDto>(frame.readText())
+    when (val incoming = jsonMapper.readValue<WebSocketMessage>(frame.readText())) {
+        is MessageDto -> onMessageDto(incoming, sessions)
+        is WebSocketMessage.Auth -> onAuth(incoming, sessions)
+        else -> {}
+    }
+}
+
+suspend fun DefaultWebSocketServerSession.onMessageDto(
+    incoming: MessageDto,
+    sessions: Map<DefaultWebSocketServerSession, Long>,
+) {
+    if (!sessions.containsKey(this)) {
+        close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "Unauthorized"))
+        return
+    }
 
     val message = dbQuery {
         Message.new {
@@ -75,16 +85,49 @@ suspend fun DefaultWebSocketServerSession.onTextMessage(frame: Frame.Text, sessi
 
     when (message.type) {
         MessageDto.MessageType.USER, MessageDto.MessageType.USER_REPLY -> {
-            // sessions[message.userToId!!]?.send(JsonFrame(message))
-            sessions[message.userToId!!]?.sendSerialized(message)
+            sendSerialized(message)
+            sessions.forEach { (t, u) ->
+                if (u != message.userToId) {
+                    return@forEach
+                }
+                t.sendSerialized(message)
+            }
         }
-        MessageDto.MessageType.GROUP, MessageDto.MessageType.GROUP_REPLY  -> {
+
+        MessageDto.MessageType.GROUP, MessageDto.MessageType.GROUP_REPLY -> {
             val group = dbQuery {
                 MessageGroup.findById(message.groupToId!!)?.load(MessageGroup::users)
             } ?: throw Exception("Group not found")
+            sendSerialized(message)
             group.users.forEach {
-                sessions[it.id.value]?.sendSerialized(message)
+                sessions.forEach { (t, u) ->
+                    if (u == it.id.value) {
+                        try {
+                            t.sendSerialized(message)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
             }
         }
     }
+}
+
+suspend fun DefaultWebSocketServerSession.onAuth(
+    incoming: WebSocketMessage.Auth,
+    sessions: MutableMap<DefaultWebSocketServerSession, Long>,
+) {
+    val principal = authorize(incoming.token)
+    val user = dbQuery {
+        principal?.subject?.toLong()?.let {
+            return@let User.findById(it)
+        }
+    }
+    if (user == null) {
+        close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "Unauthorized"))
+        return
+    }
+    sessions[this] = user.id.value
+    sendSerialized(WebSocketMessage.SystemMessage("Authorized as ${user.id.value}"))
 }

@@ -1,5 +1,8 @@
 package ru.deltadelete.netial.database.dto
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import ru.deltadelete.netial.database.dao.Message
@@ -14,7 +17,7 @@ data class MessageDto(
     val deletionDate: Instant? = null,
     val creationDate: Instant = Clock.System.now(),
     val id: Long = 0L,
-) {
+) : WebSocketMessage() {
     companion object : MappableDto<Message, MessageDto> {
         override fun from(from: Message): MessageDto {
             return MessageDto(
@@ -31,6 +34,7 @@ data class MessageDto(
         }
     }
 
+    @get:JsonIgnore
     val type: MessageType
         get() {
             return when {
@@ -48,4 +52,18 @@ data class MessageDto(
         GROUP,
         GROUP_REPLY
     }
+}
+
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "type")
+@JsonSubTypes(
+    JsonSubTypes.Type(value = MessageDto::class, name = "message"),
+    JsonSubTypes.Type(value = WebSocketMessage.Auth::class, name = "auth"),
+    JsonSubTypes.Type(value = WebSocketMessage.SystemMessage::class, name = "system")
+)
+open class WebSocketMessage() {
+    data class Auth(val token: String) : WebSocketMessage()
+    data class SystemMessage(val text: String): WebSocketMessage()
 }
