@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api/ws",
-      "destination": "https://dev.deltadelete.ru/api/ws"
+      "source": "/api/ws/:match*",
+      "destination": "https://dev.deltadelete.ru/api/ws/:match*"
     },
     {
       "source": "/((?!api\\/.*).*)",
@@ -15,8 +15,12 @@
   ],
   "headers": [
     {
-      "source": "/api/ws",
+      "source": "/api/ws/:match*",
       "headers": [
+        {
+          "key": "Upgrade",
+          "value": "websocket"
+        },
         {
           "key": "Connection",
           "value": "Upgrade"
