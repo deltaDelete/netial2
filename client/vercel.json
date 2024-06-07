@@ -8,5 +8,23 @@
       "source": "/api/:path*",
       "destination": "https://dev.deltadelete.ru/api/:path*"
     }
+  ],
+  "headers": [
+    {
+      "source": "/api/ws",
+      "headers": [
+        {
+          "key": "Connection",
+          "value": "Upgrade"
+        }
+      ],
+      "has": [
+        {
+          "type": "header",
+          "key": "Connection",
+          "value": "Upgrade"
+        }
+      ]
+    }
   ]
 }
