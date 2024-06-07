@@ -16,7 +16,6 @@ const queryClient = new QueryClient({
 });
 
 const App: Component<RouteSectionProps> = (props: RouteSectionProps) => {
-    const location = useLocation();
     return (
         <>
             <QueryClientProvider client={queryClient}>

@@ -37,7 +37,7 @@ export default function Index() {
     const [messages, setMessages] = createSignal<Message[]>([]);
     const userTo = () => Number(searchParams.user);
 
-    const ws = new WebSocket(`ws://localhost:8080/api/ws`);
+    const ws = new WebSocket(`/api/ws`);
     onMount(() => {
         ws.addEventListener("open", ev => {
             console.log("Open WebSocket session");
