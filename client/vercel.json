@@ -1,31 +1,12 @@
 {
   "rewrites": [
     {
-      "source": "/api/ws/:match*",
-      "destination": "https://dev.deltadelete.ru/api/ws/:match*"
-    },
-    {
       "source": "/((?!api\\/.*).*)",
       "destination": "/index.html"
     },
     {
       "source": "/api/:path*",
       "destination": "https://dev.deltadelete.ru/api/:path*"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/api/ws/:match*",
-      "headers": [
-        {
-          "key": "Upgrade",
-          "value": "websocket"
-        },
-        {
-          "key": "Connection",
-          "value": "Upgrade"
-        }
-      ]
     }
   ]
 }
