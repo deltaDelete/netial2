@@ -34,6 +34,10 @@ workflow(
             )
         )
         uses(
+            name = "Setup pnpm",
+            action = SetupPnpmV2("9.2.0")
+        )
+        uses(
             name = "Setup Node",
             action = SetupNodeV4()
         )
@@ -61,6 +65,10 @@ workflow(
             )
         )
         uses(
+            name = "Setup pnpm",
+            action = SetupPnpmV2("9.2.0")
+        )
+        uses(
             name = "Setup Node",
             action = SetupNodeV4(nodeVersion = "18.20.3", cache = SetupNodeV4.PackageManager.Pnpm)
         )
@@ -75,5 +83,12 @@ class GradleDependencySubmissionV3() : RegularAction<Action.Outputs>("gradle", "
     override fun buildOutputObject(stepId: String): Action.Outputs = Action.Outputs(stepId)
 
     override fun toYamlArguments(): LinkedHashMap<String, String> = linkedMapOf()
+}
 
+class SetupPnpmV2(
+    private val version: String
+) : RegularAction<Action.Outputs>("pnpm", "action-setup", "v2") {
+    override fun buildOutputObject(stepId: String): Action.Outputs = Action.Outputs(stepId)
+
+    override fun toYamlArguments(): LinkedHashMap<String, String> = linkedMapOf("version" to version)
 }
