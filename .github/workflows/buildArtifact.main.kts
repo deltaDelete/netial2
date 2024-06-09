@@ -35,11 +35,15 @@ workflow(
         )
         uses(
             name = "Setup pnpm",
-            action = SetupPnpmV2("9.2.0")
+            action = SetupPnpmV4("9")
         )
         uses(
             name = "Setup Node",
-            action = SetupNodeV4()
+            action = SetupNodeV4(
+                nodeVersion = "18",
+                cache = SetupNodeV4.PackageManager.Pnpm,
+                cacheDependencyPath = listOf("client/pnpm-lock.yaml")
+            )
         )
         run(
             name = "Build distribution",
@@ -66,11 +70,15 @@ workflow(
         )
         uses(
             name = "Setup pnpm",
-            action = SetupPnpmV2("9.2.0")
+            action = SetupPnpmV4("9")
         )
         uses(
             name = "Setup Node",
-            action = SetupNodeV4(nodeVersion = "18.20.3", cache = SetupNodeV4.PackageManager.Pnpm)
+            action = SetupNodeV4(
+                nodeVersion = "18",
+                cache = SetupNodeV4.PackageManager.Pnpm,
+                cacheDependencyPath = listOf("client/pnpm-lock.yaml")
+            )
         )
         uses(
             name = "Setup Gradle",
@@ -85,9 +93,9 @@ class GradleDependencySubmissionV3() : RegularAction<Action.Outputs>("gradle", "
     override fun toYamlArguments(): LinkedHashMap<String, String> = linkedMapOf()
 }
 
-class SetupPnpmV2(
+class SetupPnpmV4(
     private val version: String
-) : RegularAction<Action.Outputs>("pnpm", "action-setup", "v2") {
+) : RegularAction<Action.Outputs>("pnpm", "action-setup", "v4") {
     override fun buildOutputObject(stepId: String): Action.Outputs = Action.Outputs(stepId)
 
     override fun toYamlArguments(): LinkedHashMap<String, String> = linkedMapOf("version" to version)
