@@ -46,7 +46,7 @@ jobs:
       with:
         node-version: '18'
         cache: 'pnpm'
-        cache-dependency-path: 'client/pnpm-lock.yaml'
+        cache-dependency-path: './client/pnpm-lock.yaml'
     - id: 'step-4'
       name: 'Build distribution'
       run: './gradlew clean customDistZip'
@@ -54,7 +54,9 @@ jobs:
       name: 'Upload distribution'
       uses: 'actions/upload-artifact@v4'
       with:
+        name: 'distribution'
         path: 'server/build/distributions/ru.deltadelete.netial-0.0.1.zip'
+        if-no-files-found: 'error'
   dependency_submission:
     runs-on: 'ubuntu-latest'
     permissions:
@@ -82,7 +84,7 @@ jobs:
       with:
         node-version: '18'
         cache: 'pnpm'
-        cache-dependency-path: 'client/pnpm-lock.yaml'
+        cache-dependency-path: './client/pnpm-lock.yaml'
     - id: 'step-4'
       name: 'Setup Gradle'
       uses: 'gradle/actions/dependency-submission@v3'

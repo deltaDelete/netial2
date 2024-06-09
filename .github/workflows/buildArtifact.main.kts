@@ -42,7 +42,7 @@ workflow(
             action = SetupNodeV4(
                 nodeVersion = "18",
                 cache = SetupNodeV4.PackageManager.Pnpm,
-                cacheDependencyPath = listOf("client/pnpm-lock.yaml")
+                cacheDependencyPath = listOf("./client/pnpm-lock.yaml")
             )
         )
         run(
@@ -52,7 +52,9 @@ workflow(
         uses(
             name = "Upload distribution",
             action = UploadArtifactV4(
-                path = listOf("server/build/distributions/ru.deltadelete.netial-0.0.1.zip")
+                name = "distribution",
+                path = listOf("server/build/distributions/ru.deltadelete.netial-0.0.1.zip"),
+                ifNoFilesFound = UploadArtifactV4.BehaviorIfNoFilesFound.Error
             )
         )
     }
@@ -77,7 +79,7 @@ workflow(
             action = SetupNodeV4(
                 nodeVersion = "18",
                 cache = SetupNodeV4.PackageManager.Pnpm,
-                cacheDependencyPath = listOf("client/pnpm-lock.yaml")
+                cacheDependencyPath = listOf("./client/pnpm-lock.yaml")
             )
         )
         uses(
