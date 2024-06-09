@@ -5,7 +5,8 @@ plugins {
 }
 
 node {
-    npmVersion = "18.20.2"
+    version = "18.20.3"
+    pnpmVersion = "9.2.0"
 }
 
 tasks.register<PnpmTask>("pnpmDev") {

@@ -62,7 +62,7 @@ workflow(
         )
         uses(
             name = "Setup Node",
-            action = SetupNodeV4()
+            action = SetupNodeV4(nodeVersion = "18.20.3")
         )
         uses(
             name = "Setup Gradle",
