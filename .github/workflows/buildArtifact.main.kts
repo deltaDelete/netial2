@@ -18,7 +18,15 @@ import io.github.typesafegithub.workflows.yaml.writeToFile
 
 workflow(
     name = "Build artifact",
-    on = listOf(Push()),
+    on = listOf(Push(paths = listOf(
+        "./server",
+        "./client",
+        "./build.gradle.kts",
+        "./settings.gradle.kts",
+        "./gradle.properties",
+        "./gradle",
+        "./.github/workflows"
+    ))),
     sourceFile = __FILE__.toPath(),
 ) {
     job(

@@ -4,7 +4,15 @@
 
 name: 'Build artifact'
 on:
-  push: {}
+  push:
+    paths:
+    - './server'
+    - './client'
+    - './build.gradle.kts'
+    - './settings.gradle.kts'
+    - './gradle.properties'
+    - './gradle'
+    - './.github/workflows'
 jobs:
   check_yaml_consistency:
     name: 'Check YAML consistency'
