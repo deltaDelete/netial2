@@ -72,7 +72,7 @@ workflow(
 }.writeToFile()
 
 class GradleDependencySubmissionV3() : RegularAction<Action.Outputs>("gradle", "actions/dependency-submission", "v3") {
-    override fun buildOutputObject(stepId: String): Outputs = Outputs(stepId)
+    override fun buildOutputObject(stepId: String): Action.Outputs = Action.Outputs(stepId)
 
     override fun toYamlArguments(): LinkedHashMap<String, String> = linkedMapOf()
 
