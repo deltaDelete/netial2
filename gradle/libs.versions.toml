@@ -40,6 +40,7 @@ ktor-server-tests = {group = "io.ktor", name = "ktor-server-tests-jvm", version.
 kotlin-test-junit = {group = "org.jetbrains.kotlin", name = "kotlin-test-junit"}
 ktor-server-test-host-jvm = {group = "io.ktor", name = "ktor-server-test-host-jvm", version.ref = "ktor"}
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test"}
+ktor-client-content-negotiation-jvm = { group = "io.ktor", name = "ktor-client-content-negotiation-jvm", version.ref = "ktor" }
 
 
 [plugins]

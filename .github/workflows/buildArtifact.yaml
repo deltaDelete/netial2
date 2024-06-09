@@ -1,0 +1,70 @@
+# This file was generated using Kotlin DSL (.github/workflows/buildArtifact.main.kts).
+# If you want to modify the workflow, please change the Kotlin file and regenerate this YAML file.
+# Generated with https://github.com/typesafegithub/github-workflows-kt
+
+name: 'Build artifact'
+on:
+  push: {}
+jobs:
+  check_yaml_consistency:
+    name: 'Check YAML consistency'
+    runs-on: 'ubuntu-latest'
+    steps:
+    - id: 'step-0'
+      name: 'Check out'
+      uses: 'actions/checkout@v4'
+    - id: 'step-1'
+      name: 'Execute script'
+      run: 'rm ''.github/workflows/buildArtifact.yaml'' && ''.github/workflows/buildArtifact.main.kts'''
+    - id: 'step-2'
+      name: 'Consistency check'
+      run: 'git diff --exit-code ''.github/workflows/buildArtifact.yaml'''
+  build:
+    runs-on: 'ubuntu-latest'
+    permissions:
+      contents: 'read'
+    needs:
+    - 'check_yaml_consistency'
+    steps:
+    - id: 'step-0'
+      name: 'Check out'
+      uses: 'actions/checkout@v4'
+    - id: 'step-1'
+      name: 'Setup Java'
+      uses: 'actions/setup-java@v4'
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    - id: 'step-2'
+      name: 'Setup Node'
+      uses: 'actions/setup-node@v4'
+    - id: 'step-3'
+      name: 'Build distribution'
+      run: './gradlew clean customDistZip'
+    - id: 'step-4'
+      name: 'Upload distribution'
+      uses: 'actions/upload-artifact@v4'
+      with:
+        path: 'server/build/distributions/ru.deltadelete.netial-0.0.1.zip'
+  dependency_submission:
+    runs-on: 'ubuntu-latest'
+    permissions:
+      contents: 'write'
+    needs:
+    - 'check_yaml_consistency'
+    steps:
+    - id: 'step-0'
+      name: 'Check out'
+      uses: 'actions/checkout@v4'
+    - id: 'step-1'
+      name: 'Setup Java'
+      uses: 'actions/setup-java@v4'
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    - id: 'step-2'
+      name: 'Setup Node'
+      uses: 'actions/setup-node@v4'
+    - id: 'step-3'
+      name: 'Setup Gradle'
+      uses: 'gradle/actions/dependency-submission@v3'

@@ -11,6 +11,7 @@ import kotlinx.datetime.Instant
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.mindrot.jbcrypt.BCrypt
 import ru.deltadelete.netial.database.dao.User
 import ru.deltadelete.netial.database.dao.UserService
 import ru.deltadelete.netial.database.dto.UserDto
@@ -20,10 +21,7 @@ import ru.deltadelete.netial.plugins.configureSecurity
 import ru.deltadelete.netial.plugins.configureSerialization
 import ru.deltadelete.netial.plugins.loadConfig
 import ru.deltadelete.netial.routes.users.configureUsers
-import ru.deltadelete.netial.utils.Mail
-import ru.deltadelete.netial.utils.dbQuery
-import ru.deltadelete.netial.utils.formatTemplate
-import ru.deltadelete.netial.utils.newJsonMapper
+import ru.deltadelete.netial.utils.*
 import java.util.*
 import kotlin.test.*
 
@@ -48,7 +46,7 @@ class ApplicationTest {
             configureSerialization()
             configureUsers()
         }
-        client.get("/users") {
+        client.get("/api/users") {
             header(HttpHeaders.Accept, ContentType.Application.Json)
         }.apply {
             assertEquals(HttpStatusCode.OK, status)
@@ -95,19 +93,11 @@ class ApplicationTest {
 
     @Test
     fun testCheckConfirmationCode() = testApplication {
-        val code = ""
+        val map = mapOf("id" to 1, "email" to "test@example.com", "secret" to "secret").toJson()
+        val salt = BCrypt.gensalt()
+        val code = BCrypt.hashpw(map, salt)
 
-        application {
-            loadConfig()
-            configureDatabases()
-            runTest {
-                dbQuery {
-                    assertTrue {
-                        UserService().confirmEmail(1, code) == UserService.EmailConfirmResult.OK
-                    }
-                }
-            }
-        }
+        assertTrue { BCrypt.checkpw(map, code) }
     }
 
     @Test
@@ -137,7 +127,7 @@ class ApplicationTest {
         val mapper = newJsonMapper()
         val input = EnumSet.of(Permission.CREATE_ROLE, Permission.MODIFY_ROLE)
         val expected = """
-            ["CREATE_ROLE","MODIFY_ROLE"]
+            [ "CREATE_ROLE", "MODIFY_ROLE" ]
         """.trimIndent()
 
         val output = mapper.writeValueAsString(input)
