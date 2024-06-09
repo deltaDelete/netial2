@@ -5,6 +5,7 @@ plugins {
 }
 
 node {
+    download = true
     version = "18.20.3"
     pnpmVersion = "9.2.0"
 }
