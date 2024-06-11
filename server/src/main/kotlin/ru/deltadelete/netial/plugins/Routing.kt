@@ -12,7 +12,8 @@ import ru.deltadelete.netial.utils.Config
 fun Application.configureRouting() {
     install(StatusPages) {
         exception<Throwable> { call, cause ->
-            if (call.request.headers["Accept"] == "application/json") {
+            cause.printStackTrace()
+            if (call.request.headers["Accept"] == ContentType.Application.Json.toString()) {
                 call.respond(
                     HttpStatusCode.InternalServerError,
                     Error.ExceptionError(
