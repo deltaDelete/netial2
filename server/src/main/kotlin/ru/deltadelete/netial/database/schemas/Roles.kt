@@ -14,5 +14,6 @@ object Roles : DeletableLongIdTable("roles") {
     val name = varchar("name", length = 50)
     val description = varchar("description", length = 255)
     val permissions = long("permissions").default(0L)
+    val isDefault = bool("is_default").default(false)
 }
 

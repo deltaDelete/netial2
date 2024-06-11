@@ -23,7 +23,8 @@ CREATE TABLE roles
     is_deleted    bool         NOT NULL DEFAULT FALSE,
     name          varchar(50)  NOT NULL,
     description   varchar(255) NOT NULL,
-    permissions   bigint       NOT NULL DEFAULT 0
+    permissions   bigint       NOT NULL DEFAULT 0,
+    is_default    bool         NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE groups

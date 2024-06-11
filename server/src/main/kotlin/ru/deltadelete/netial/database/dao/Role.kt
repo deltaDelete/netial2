@@ -17,6 +17,7 @@ class Role(id: EntityID<Long>) : LongEntity(id), DeletableEntity {
         { permissions -> permissions.sumOf { it.value } },
         { Permission.fromBitMask(it) }
     )
+    var isDefault by Roles.isDefault
 
     override var isDeleted by Roles.isDeleted
     override var creationDate by Roles.creationDate

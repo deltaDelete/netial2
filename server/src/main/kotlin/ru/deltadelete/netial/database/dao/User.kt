@@ -37,7 +37,7 @@ class User(id: EntityID<Long>) : LongEntity(id), DeletableEntity {
     override var creationDate by Users.creationDate
     override var deletionDate by Users.deletionDate
 
-    val roles by Role via UsersRoles
+    var roles by Role via UsersRoles
     val messageGroups by MessageGroup via MessageGroupUsers
     val ownedMessageGroups by MessageGroup referrersOn MessageGroups.creator
     val groups by Group via UsersGroups

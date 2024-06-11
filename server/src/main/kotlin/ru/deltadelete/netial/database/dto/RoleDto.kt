@@ -12,6 +12,7 @@ data class RoleDto(
     val isDeleted: Boolean = false,
     val creationDate: Instant = Clock.System.now(),
     val deletionDate: Instant? = null,
+    val isDefault: Boolean = false,
     val id: Long = 0L,
 ) {
     companion object : MappableDto<Role, RoleDto> {
@@ -23,6 +24,7 @@ data class RoleDto(
                 from.isDeleted,
                 from.creationDate,
                 from.deletionDate,
+                from.isDefault,
                 from.id.value,
             )
         }

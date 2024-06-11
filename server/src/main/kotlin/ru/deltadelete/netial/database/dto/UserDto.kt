@@ -2,7 +2,9 @@ package ru.deltadelete.netial.database.dto
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import ru.deltadelete.netial.database.dao.Role
 import ru.deltadelete.netial.database.dao.User
+import ru.deltadelete.netial.database.schemas.Roles
 
 open class UserDto(
     val lastName: String,
@@ -47,6 +49,7 @@ open class UserDto(
                 creationDate = user.creationDate
                 isDeleted = user.isDeleted
                 deletionDate = user.deletionDate
+                roles = Role.find { Roles.isDefault eq true }
             }
         }
     }
