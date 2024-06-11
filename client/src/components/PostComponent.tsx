@@ -26,13 +26,12 @@ export default function PostComponent(props: PostComponentProps) {
         <PostContextProvider post={props.value}>
             <div class="post self-stretch">
                 <div class="post-text"
-                     onClick={() => props.navigatable && navigate(`/posts/${props.value.id}`, { state: { post: props.value } })}
+                     onClick={() => props.navigatable && navigate(`/posts/${props.value.id}`, "target" in props.value ? { state: { post: props.value.target } } : undefined)}
                      classList={{
-                         "cursor-pointer": props.navigatable,
-                         "max-h-[10rem] overflow-clip": props.navigatable,
+                         "cursor-pointer": props.navigatable
                      }}
                 >
-                    <Markdoc content={props.value.text} />
+                    <Markdoc content={props.value.text} limit={props.navigatable && 2} />
                 </div>
                 <div class="text-end flex flex-row justify-between content-center text-white/50">
                     <UserComponent user={props.value.user} reverse />
@@ -125,14 +124,14 @@ function LikeButton() {
     const hasLike = createQuery(() => ({
         queryKey: ["hasLike", post().id],
         queryFn: async () => await ApiClient.instance.posts.hasLike(post().id!!),
-        enabled: !!post().id,
+        enabled: !!post().id
     }));
 
 
     return (
         <Button disabled={!user()} class="button small grow" classList={{
             "primary": hasLike.data,
-            "secondary": !hasLike.data,
+            "secondary": !hasLike.data
         }} onClick={onLikeClick}>
             Нравится
             <div class="counter">{likes()}</div>

@@ -1,6 +1,6 @@
 import { createEffect, createMemo, createSignal, JSX } from "solid-js";
 import render from "solidjs-markdoc";
-import Markdoc from "@markdoc/markdoc";
+import Markdoc, { RenderableTreeNode } from "@markdoc/markdoc";
 import attachment from "@/markdoc/schema/Attachment.markdoc";
 import { Dynamic } from "solid-js/web";
 import "./markdown.css";
@@ -13,7 +13,13 @@ export function Renderer(props: MarkdocRendererProps): JSX.Element {
             attachment
         }
     };
-    const content = createMemo(() => Markdoc.transform(ast(), config));
+    const content = createMemo<RenderableTreeNode>(() => {
+        const tree = Markdoc.transform(ast(), config) as MarkdocNode;
+        if (tree && props.limit) {
+            tree.children.length > 2 && (tree.children = tree.children.splice(0, props.limit));
+        }
+        return tree;
+    });
     return render(content(), {
         components: {
             h1: (props: HTMLHeadingElement) => <Heading level={1} {...props} />,
@@ -32,7 +38,14 @@ export function Renderer(props: MarkdocRendererProps): JSX.Element {
 }
 
 export type MarkdocRendererProps = {
-    content: string
+    content: string,
+    limit?: number,
+}
+
+type MarkdocNode = {
+    attributes: any,
+    children: MarkdocNode[],
+    name: string
 }
 
 export function Attachment(props: { src: string, label: any, size: string }): JSX.Element {
@@ -97,7 +110,7 @@ function ListItem(props: { children: any[] }) {
 function Link(props: any) {
     return (
         <a {...props} class="link" rel="noopener noreferrer" target="_blank" />
-    )
+    );
 }
 
 function Root(props: { children: any[] }) {
