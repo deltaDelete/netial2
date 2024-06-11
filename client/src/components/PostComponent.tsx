@@ -124,7 +124,7 @@ function LikeButton() {
     const hasLike = createQuery(() => ({
         queryKey: ["hasLike", post().id],
         queryFn: async () => await ApiClient.instance.posts.hasLike(post().id!!),
-        enabled: !!post().id
+        enabled: !!post().id && !!user()
     }));
 
 
