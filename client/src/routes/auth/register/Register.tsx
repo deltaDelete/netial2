@@ -3,6 +3,8 @@ import { AuthResult, LoginBody, RegisterBody } from "@/utils/AuthManager";
 import { createSignal, Show } from "solid-js";
 import Input from "@components/InputComponent";
 import { useNavigate } from "@solidjs/router";
+import Icon from "@components/Icon";
+import { Button } from "@kobalte/core/button";
 
 const emailRegEx: RegExp = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
@@ -12,9 +14,11 @@ export default function Register() {
 
     const onSubmit = (e: SubmitEvent) => {
         e.preventDefault();
+        setPending(true);
         const registerBody = credentials();
         console.log(registerBody);
         register(registerBody).then(({ result, response }) => {
+            setPending(false);
             if (result == AuthResult.BadCredentials) {
                 setHasHasError("invalid");
                 response.message && setErrorMessage(response.message);
@@ -29,6 +33,7 @@ export default function Register() {
         });
     };
 
+    const [pending, setPending] = createSignal(false);
     const [username, setUsename] = createSignal("");
     const [password, setPassword] = createSignal("");
     const [email, setEmail] = createSignal("");
@@ -74,7 +79,11 @@ export default function Register() {
                 <Show when={errorMessage()}>
                     <p class="error-message">{errorMessage()}</p>
                 </Show>
-                <button class="button small" type="submit">Зарегистрироваться</button>
+                <Button class="button small" type="submit">
+                    <Show when={pending()} fallback={"Зарегистрироваться"}>
+                        <Icon code={"\ue9d0"} size={"1.2rem"} class="animate-spin" />
+                    </Show>
+                </Button>
             </form>
         </div>
     );
