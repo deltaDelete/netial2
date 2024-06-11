@@ -12,41 +12,59 @@ enum class Permission(val value: Long) {
     CREATE_ROLE(1 shl 0),
     MODIFY_ROLE(1 shl 1),
     REMOVE_ROLE(1 shl 2),
+
     // GROUP
     CREATE_GROUP(1 shl 3),
     MODIFY_GROUP(1 shl 4),
     REMOVE_GROUP(1 shl 5),
+
     // POST
     CREATE_POST(1 shl 6),
     MODIFY_POST(1 shl 7),
     REMOVE_POST(1 shl 8),
+
     // COMMENT
     CREATE_COMMENT(1 shl 9),
     MODIFY_COMMENT(1 shl 10),
     REMOVE_COMMENT(1 shl 11),
+
     // USER
     CREATE_USER(1 shl 12),
     REMOVE_USER(1 shl 13),
     MODIFY_USER(1 shl 14),
+
     // SELF REMOVE
     SELF_REMOVE_POST(1 shl 15),
     SELF_REMOVE_COMMENT(1 shl 16),
     SELF_REMOVE_USER(1 shl 17),
+
     // SELF MODIFY
     SELF_MODIFY_USER(1 shl 18),
     SELF_MODIFY_POST(1 shl 19),
     SELF_MODIFY_COMMENT(1 shl 20),
+
     // SELF CREATE
     SELF_CREATE_POST(1 shl 21),
     SELF_CREATE_COMMENT(1 shl 22),
+
     // ATTACHMENT
     CREATE_ATTACHMENT(1 shl 23),
     MODIFY_ATTACHMENT(1 shl 24),
     REMOVE_ATTACHMENT(1 shl 25),
+
     // SELF ATTACHMENT
     SELF_CREATE_ATTACHMENT(1 shl 26),
     SELF_MODIFY_ATTACHMENT(1 shl 27),
-    SELF_REMOVE_ATTACHMENT(1 shl 28),;
+    SELF_REMOVE_ATTACHMENT(1 shl 28),
+
+    // MESSAGE
+    CREATE_MESSAGE(1 shl 29),
+    MODIFY_MESSAGE(1 shl 30),
+    REMOVE_MESSAGE(1 shl 31),
+    SELF_CREATE_MESSAGE(1 shl 32),
+    SELF_MODIFY_MESSAGE(1 shl 33),
+    SELF_REMOVE_MESSAGE(1 shl 34),
+    ;
 
     companion object {
         fun fromBitMask(mask: Long): EnumSet<Permission> {

@@ -20,6 +20,7 @@ fun Application.configureHTTP() {
         allowMethod(HttpMethod.Delete)
         allowMethod(HttpMethod.Options)
         allowHeader(HttpHeaders.ContentType)
+        allowHeader(HttpHeaders.AcceptLanguage)
         allowHeader(HttpHeaders.Authorization)
         allowHeader(HttpHeaders.AccessControlAllowCredentials)
         allowHeader(HttpHeaders.AccessControlAllowOrigin)
@@ -34,6 +35,14 @@ fun Application.configureHTTP() {
         allowHeader(HttpHeaders.Pragma)
         allowHeader(HttpHeaders.Host)
         allowHeader(HttpHeaders.Connection)
+        allowHeader(HttpHeaders.Forwarded)
+        allowHeader(HttpHeaders.XForwardedFor)
+        allowHeader(HttpHeaders.XForwardedHost)
+        allowHeader(HttpHeaders.XForwardedProto)
+        allowHeadersPrefixed("Sec-Websocket")
+        allowHeader("Cdn-Loop")
+        allowHeadersPrefixed("Cf-")
+        allowHeadersPrefixed("X-Vercel-")
     }
     install(DefaultHeaders)
 }

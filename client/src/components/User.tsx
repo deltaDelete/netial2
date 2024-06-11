@@ -44,6 +44,7 @@ export default function UserComponent(props: UserComponentProps) {
         initialValue: props.user,
         ssrLoadFrom: "initial"
     });
+    const classes = () => props.class?.split(" ").concat("text-xl text-inherit button ghost small".split(" ")).join(" ")
     return (
         <Show when={user()}>
             <div class="flex gap-1 place-items-center text-inherit" classList={{
@@ -51,7 +52,7 @@ export default function UserComponent(props: UserComponentProps) {
                 "text-start": props.reverse,
                 "flex-row": !props.reverse
             }}>
-                <A state={{ user: user() }} href={`/users/${user()!.id}`} class="text-xl text-inherit button ghost small">{user()!.firstName} {user()!.lastName}</A>
+                <A state={{ user: user() }} href={`/users/${user()!.id}`} class={classes()}>{user()!.firstName} {user()!.lastName}</A>
             </div>
         </Show>
     );
@@ -60,5 +61,6 @@ export default function UserComponent(props: UserComponentProps) {
 type UserComponentProps = {
     id?: number,
     user?: User,
-    reverse?: true
+    reverse?: true,
+    class?: string
 }

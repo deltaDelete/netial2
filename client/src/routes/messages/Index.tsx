@@ -1,31 +1,22 @@
 import {
     Show,
-    createEffect,
     createSignal,
     onMount,
     For,
-    createResource,
     onCleanup,
-    Suspense,
     Switch,
     Match
 } from "solid-js";
-import WithId from "@/types/WithId";
-import Deletable from "@/types/Deletable";
 import { Message, MessageBase, MessageWS, SystemMessage, WebSocketAuth, WebSocketMessage } from "@/types/Message";
 import AuthManager from "@/utils/AuthManager";
-import { useAuthContext } from "@/utils/AuthContext";
 import ApiClient from "@/utils/ApiClient";
-import UserComponent from "@components/User";
 import Input from "@components/InputComponent";
 import Icon from "@components/Icon";
 import { Button } from "@kobalte/core/button";
 import MessageComponent from "@components/MessageComponent";
 import { useSearchParams } from "@solidjs/router";
 import PaginationComponent from "@components/PaginationComponent";
-import User from "@/types/User";
-import { createQuery } from "@tanstack/solid-query";
-import { Loading } from "@components/Loading";
+import { createInfiniteQuery, createQuery } from "@tanstack/solid-query";
 
 export default function Index() {
     const [open, setOpen] = createSignal(false);
@@ -36,6 +27,18 @@ export default function Index() {
     }>();
     const [messages, setMessages] = createSignal<Message[]>([]);
     const userTo = () => Number(searchParams.user);
+
+    const prevMessages = createInfiniteQuery(() => ({
+        queryKey: ["messages", "user", userTo()],
+        queryFn: context => ApiClient.instance.messages.getAll(userTo(), undefined, context.pageParam),
+        initialPageParam: 1,
+        getNextPageParam: (lastPage, allPages, lastPageParam) => {
+            if (lastPage.length < 10) {
+                return undefined;
+            }
+            return lastPageParam + 1;
+        },
+    }));
 
     const ws = new WebSocket(`${import.meta.env.VITE_BACK_DOMAIN}/api/ws`);
     onMount(() => {
@@ -54,7 +57,7 @@ export default function Index() {
             const message = JSON.parse(ev.data);
             if (message satisfies WebSocketMessage && message.type == "message") {
                 if (message.userId == userTo() || message.userToId == userTo()) {
-                    setMessages([...messages(), JSON.parse(ev.data)]);
+                    setMessages([JSON.parse(ev.data), ...messages()]);
                 }
                 return;
             }
@@ -97,7 +100,8 @@ export default function Index() {
     }));
 
     return (
-        <div class="flex flex-col gap-4 justify-items-center w-full container root-container min-h-[80dvh]">
+        <div
+            class="flex flex-col gap-4 justify-items-center w-full container root-container min-h-[80dvh] max-h-[100dvh] scroll-auto">
             <Show when={!userTo()}>
                 <Switch>
                     <Match when={users.isLoading}>
@@ -123,10 +127,31 @@ export default function Index() {
                     <Icon code={"\ue5c4"} size="1.5rem" />
                     Назад
                 </Button>
-                <div class="flex flex-col gap-2 justify-end overflow-y-scroll grow basis-1 inner-container">
-                    <For each={messages()}>{item =>
-                        <MessageComponent data={item} />
-                    }</For>
+                <div class="overflow-y-scroll basis-1 grow shrink-0 inner-container">
+                    <div class="flex flex-col-reverse gap-2 justify-end h-fit">
+                        <For each={messages()}>{item =>
+                            <MessageComponent data={item} />
+                        }</For>
+                        <Switch>
+                            <Match when={prevMessages.isFetched}>
+                                <For each={prevMessages.data?.pages}>{page =>
+                                    <For each={page}>{item =>
+                                        <MessageComponent data={item} />
+                                    }</For>
+                                }</For>
+                            </Match>
+                            <Match when={prevMessages.isLoading}>
+                                <Icon code={"\ue9d0"} size={"3rem"} class="animate-spin self-center" />
+                            </Match>
+                        </Switch>
+                        <Show when={prevMessages.hasNextPage}>
+                            <Button class="button small" disabled={!prevMessages.hasNextPage} onClick={() => prevMessages.fetchNextPage()}>
+                                <Show when={prevMessages.isFetchingNextPage} fallback={"Больше"}>
+                                    <Icon code={"\ue9d0"} size={"1.2rem"} class="animate-spin self-center" />
+                                </Show>
+                            </Button>
+                        </Show>
+                    </div>
                 </div>
                 <Show when={error()}>
                     <p class="bg-error p-2 rounded-md">{error()}</p>

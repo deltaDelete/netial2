@@ -20,7 +20,7 @@ export default function MessageComponent(props: {data: Message}) {
                  "outgoing": (props.data.userId == user()!.sub),
                  "incoming": (props.data.userId != user()!.sub)
              }}>
-            <UserComponent user={messageUser.data} id={props.data.userId} />
+            <UserComponent class="!text-[1rem] !normal-case underline !p-1 !font-semibold" user={messageUser.data} id={props.data.userId} />
             <p>{props.data.text}</p>
         </div>
     )

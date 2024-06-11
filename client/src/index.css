@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 :root {
-    @apply font-display;
+    @apply font-display text-white;
     font-size: 100%;
-    color-scheme: light dark;
+    color-scheme: dark;
 }
 
 html {
@@ -110,7 +110,8 @@ code {
     }
 
     & .button:not(:first-child):not(:last-child) {
-        @apply rounded-none max-sm:border-t max-sm:border-b sm:border-s sm:border-e border-black border-opacity-20;
+        @apply rounded-none max-sm:border-t max-sm:border-b sm:border-s sm:border-e border-black border-opacity-20
+        disabled:max-sm:border-t disabled:max-sm:border-b disabled:sm:border-s disabled:sm:border-e disabled:border-white/20;
     }
 
     & .button:first-child {
