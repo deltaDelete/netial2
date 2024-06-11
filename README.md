@@ -1,6 +1,7 @@
 # Netial
 
 [![Build artifact](https://github.com/deltaDelete/netial2/actions/workflows/buildArtifact.yaml/badge.svg)](https://github.com/deltaDelete/netial2/actions/workflows/buildArtifact.yaml)
+![Time](https://wakatime.com/badge/user/f3bc9eee-86a3-40f2-aced-c53ee1f97155/project/13251fc1-8261-4537-9357-0cff19a6f8c7.svg)
 
 ## Getting started
 
