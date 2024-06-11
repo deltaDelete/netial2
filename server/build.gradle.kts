@@ -51,11 +51,14 @@ dependencies {
 
 distributions {
     create("custom") {
-        val jarTask = tasks.getByPath(":netial-server:jar")
+        val jarTask = tasks.getByPath(":netial-server:shadowJar")
         val clientBuild = tasks.getByPath(":client:pnpmBuild")
         distributionBaseName = rootProject.name
         contents {
             from(jarTask.outputs.files) {
+                into("")
+            }
+            from(project.files("start.sh", "start.bat")) {
                 into("")
             }
             from(rootProject.file("config.example.json")) {
