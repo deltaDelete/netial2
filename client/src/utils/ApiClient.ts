@@ -2,6 +2,8 @@ import { RolesClient } from "@/utils/RolesClient";
 import { UsersClient } from "@/utils/UsersClient";
 import { PostsClient } from "@/utils/PostsClient";
 import { MessagesClient } from "@/utils/MessagesClient";
+import { AttachmentClient } from "@/utils/AttachmentClient";
+import { Attachment } from "@/types/Attachment";
 
 export default class ApiClient {
     private static _instance?: ApiClient;
@@ -17,12 +19,14 @@ export default class ApiClient {
     private readonly _users: UsersClient;
     private readonly _roles: RolesClient;
     private readonly _messages: MessagesClient;
+    private readonly _attachments: AttachmentClient;
 
     private constructor() {
         this._posts = new PostsClient();
         this._users = new UsersClient();
         this._roles = new RolesClient();
         this._messages = new MessagesClient();
+        this._attachments = new AttachmentClient();
     }
 
     public get posts(): PostsClient {
@@ -40,5 +44,8 @@ export default class ApiClient {
     public get messages(): MessagesClient {
         return this._messages;
     }
-}
 
+    public get attachments(): AttachmentClient {
+        return this._attachments;
+    }
+}

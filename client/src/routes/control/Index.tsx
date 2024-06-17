@@ -15,6 +15,7 @@ import { useRouter } from "@solidjs/router/dist/routing";
 import { Fallback } from "@kobalte/core/image";
 import { createQuery, useQueryClient } from "@tanstack/solid-query";
 import Icon from "@components/Icon";
+import { Attachment as attachment } from "@/types/Attachment";
 
 export default function Index() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -29,6 +30,7 @@ export default function Index() {
                 <Tabs.Trigger value="users">Пользователи</Tabs.Trigger>
                 <Tabs.Trigger value="roles">Роли</Tabs.Trigger>
                 <Tabs.Trigger value="posts">Публикации</Tabs.Trigger>
+                <Tabs.Trigger value="attachments">Вложения</Tabs.Trigger>
             </Tabs.List>
             <Tabs.Content value="users" class="flex flex-col items-center">
                 <div class="container root-container">
@@ -43,6 +45,11 @@ export default function Index() {
             <Tabs.Content value="posts" class="flex flex-col items-center">
                 <div class="container root-container">
                     <Posts />
+                </div>
+            </Tabs.Content>
+            <Tabs.Content value="attachments" class="flex flex-col items-center">
+                <div class="container root-container">
+                    <Attachments />
                 </div>
             </Tabs.Content>
         </Tabs>
@@ -218,6 +225,72 @@ function Post(props: { post: post, onDelete: (() => void) | undefined }) {
             </div>
             <div
                 class="flex flex-row max-sm:basis-full basis-1/2 flex-wrap max-sm:flex-grow max-sm:place-content-center place-content-end gap-1 self-center justify-self-end">
+                <Button class="button secondary small max-sm:basis-full" disabled={!hasModify()}>Изменить</Button>
+                <DeleteButton onConfirm={props.onDelete} disabled={!hasRemove()} />
+            </div>
+        </div>
+    );
+}
+
+function Attachments() {
+    const queryClient = useQueryClient();
+    const pages = createQuery(() => ({
+        queryKey: ["attachmentsPages"],
+        queryFn: async () => await ApiClient.instance.attachments.totalPages()
+    }));
+    const [page, setPage] = createSignal(1);
+    const attachments = createQuery(() => ({
+        queryKey: ["attachments", page()],
+        queryFn: async () => {
+            return await ApiClient.instance.attachments.getAll(page());
+        }
+    }));
+    return (
+        <div class="flex flex-col gap-4 justify-items-center">
+            <Switch>
+                <Match when={attachments.isLoading}>
+                    <Icon code={"\ue9d0"} size={"3rem"} class="animate-spin" />
+                </Match>
+
+                <Match when={attachments.isFetched}>
+                    <For each={attachments.data}>{(item, index) => (
+                        <Attachment attachment={item}
+                                    onDelete={() => item.id && ApiClient.instance.posts.delete(item.id).then(value => {
+                                        value.status == 204 && queryClient.invalidateQueries({
+                                            queryKey: ["posts", page()]
+                                        });
+                                    })} />
+                    )}</For>
+                    <Show when={pages.isFetched && pages.data! > 1}>
+                        <PaginationComponent totalPages={pages.data!} page={page()} onPageChange={setPage} />
+                    </Show>
+                </Match>
+
+            </Switch>
+        </div>
+    );
+}
+
+function Attachment(props: { attachment: attachment, onDelete: (() => void) | undefined }) {
+    const [_user, { hasPermission }, _roles] = useAuthContext();
+    const hasRemove = hasPermission(Permission.REMOVE_ATTACHMENT);
+    const hasModify = hasPermission(Permission.MODIFY_ATTACHMENT);
+
+    return (
+        <div class="item"
+             classList={{ "deleted": props.attachment.isDeleted }}>
+            <div class="flex flex-col flex-grow basis-1/4 gap-1 flex-wrap">
+                <p>Имя файла{props.attachment.name}</p>
+                <p>Тип: {props.attachment.mimeType}</p>
+                <p class="overflow-hidden max-w-[16.5ch]"
+                   onClick={() => window.navigator.clipboard.writeText(props.attachment.hash)}
+                   title="Нажмите, чтобы копировать">Хеш: {props.attachment.hash}</p>
+                <p>Дата создания: {new Date(props.attachment.creationDate).toLocaleString()}</p>
+                <A href={`/users/${props.attachment.userId}`} class="link">@{props.attachment.user?.userName}</A>
+            </div>
+            <div
+                class="flex flex-row max-sm:basis-full basis-3/4 flex-wrap max-sm:flex-grow max-sm:place-content-center place-content-end gap-1 self-center justify-self-end">
+                <A target="_blank" href={`/api/attachments/${props.attachment.id}/data`} class="button small max-sm:basis-full">Открыть</A>
                 <Button class="button secondary small max-sm:basis-full" disabled={!hasModify()}>Изменить</Button>
                 <DeleteButton onConfirm={props.onDelete} disabled={!hasRemove()} />
             </div>

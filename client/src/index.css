@@ -209,3 +209,17 @@ div[role="tablist"] {
     }
 
 }
+
+.dropzone {
+    @apply invisible absolute w-full h-full top-0 rounded-xl border-2 border-transparent border-dashed
+    pointer-events-none flex flex-col gap-2 place-content-center place-items-center bg-amber-400/20;
+}
+
+.dropzone.drop {
+    @apply visible border-amber-400;
+}
+
+.attachment {
+    @apply flex flex-row max-w-fit bg-container p-4 border border-white border-opacity-20 self-start rounded text-white
+    hover:text-white hover:bg-slate-500;
+}

@@ -10,6 +10,8 @@ import { lazy } from "solid-js";
 import { MatchFilters } from "@solidjs/router/dist/types";
 
 const root = document.getElementById("root");
+window.addEventListener("dragover", e => e.preventDefault(),false);
+window.addEventListener("drop", e => e.preventDefault(),false);
 
 if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
     throw new Error(

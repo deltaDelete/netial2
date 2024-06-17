@@ -138,7 +138,8 @@ export class PostsClient implements ApiBase<Post> {
                 ["Content-Type"]: "application/json",
                 ["Accept"]: "application/json",
                 ["Authorization"]: `Bearer ${AuthManager.instance.token}`
-            })
+            }),
+            body: JSON.stringify(newItem)
         });
 
         return await response.json() as Post;
