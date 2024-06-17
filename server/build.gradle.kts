@@ -1,3 +1,5 @@
+import java.io.FileWriter
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
@@ -5,7 +7,7 @@ plugins {
 }
 
 group = "ru.deltadelete.netial"
-version = "0.0.1"
+version = "0.1.0"
 
 application {
     mainClass = "ru.deltadelete.netial.ApplicationKt"
@@ -32,6 +34,7 @@ dependencies {
     implementation(libs.ktor.serialization.kotlinx.json.jvm)
     implementation(libs.ktor.server.call.id.jvm)
     implementation(libs.ktor.server.netty.jvm)
+    implementation(libs.ktor.server.caching.headers)
     implementation(libs.exposed.core)
     implementation(libs.exposed.jdbc)
     implementation(libs.exposed.dao)
@@ -78,6 +81,7 @@ distributions {
 tasks.withType<Jar> {
     manifest {
         attributes["Main-Class"] = application.mainClass
+        attributes["Implementation-Version"] = version
     }
 }
 
@@ -85,3 +89,20 @@ tasks.withType<Jar> {
 tasks.withType<AbstractCopyTask> {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
+
+tasks.register<DefaultTask>("composeSourceCode") {
+    val appendToFile = project.layout.buildDirectory.file("generated/sourceCode")
+    val appendTo = appendToFile.get().asFile
+    appendTo.parentFile.mkdirs()
+    appendTo.createNewFile()
+    FileWriter(appendTo, Charsets.UTF_8, true).use {
+        val files = project.fileTree("./src").files
+        files.forEach { file ->
+            println("Processing file ${file.path}")
+            it.appendLine("// ${file.relativeTo(project.projectDir.absoluteFile).path}")
+            val content = file.readText(Charsets.UTF_8)
+            it.appendLine(content)
+        }
+    }
+}
+

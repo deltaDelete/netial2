@@ -1,7 +1,9 @@
 package ru.deltadelete.netial.plugins
 
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.plugins.openapi.*
@@ -45,4 +47,17 @@ fun Application.configureHTTP() {
         allowHeadersPrefixed("X-Vercel-")
     }
     install(DefaultHeaders)
+
+    routing {
+        install(CachingHeaders) {
+            options { call, content ->
+                return@options when (content.contentType?.withoutParameters()) {
+                    ContentType.Text.Plain -> CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 3600))
+                    ContentType.Text.Html -> CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 3600))
+                    ContentType.Application.Json -> CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 300))
+                    else -> null
+                }
+            }
+        }
+    }
 }

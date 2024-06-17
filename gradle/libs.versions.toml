@@ -1,8 +1,8 @@
 [versions]
-kotlin = "1.9.23"
-ktor = "2.3.10"
+kotlin = "2.0.0"
+ktor = "2.3.11"
 jakarta-mail = "2.0.1"
-exposed = "0.49.0"
+exposed = "0.51.1"
 h2 = "2.2.220"
 postgresql = "42.7.3"
 jbcrypt = "0.4"
@@ -27,6 +27,7 @@ ktor-server-auth-jwt-jvm = { group = "io.ktor", name = "ktor-server-auth-jwt-jvm
 ktor-serialization-kotlinx-json-jvm = { group = "io.ktor", name = "ktor-serialization-kotlinx-json-jvm", version.ref = "ktor" }
 ktor-server-call-id-jvm = { group = "io.ktor", name = "ktor-server-call-id-jvm", version.ref = "ktor" }
 ktor-server-netty-jvm = { group = "io.ktor", name = "ktor-server-netty-jvm", version.ref = "ktor" }
+ktor-server-caching-headers = { group = "io.ktor", name = "ktor-server-caching-headers", version.ref = "ktor" }
 exposed-core = { group = "org.jetbrains.exposed", name = "exposed-core", version.ref = "exposed" }
 exposed-jdbc = { group = "org.jetbrains.exposed", name = "exposed-jdbc", version.ref = "exposed" }
 exposed-dao = { group = "org.jetbrains.exposed", name = "exposed-dao", version.ref = "exposed" }
@@ -36,10 +37,10 @@ postgresql = { group = "org.postgresql", name = "postgresql", version.ref = "pos
 jbcrypt = { group = "org.mindrot", name = "jbcrypt", version.ref = "jbcrypt" }
 logback-classic = { group = "ch.qos.logback", name = "logback-classic", version.ref = "logback" }
 jakarta-mail = { group = "com.sun.mail", name = "jakarta.mail", version.ref = "jakarta-mail" }
-ktor-server-tests = {group = "io.ktor", name = "ktor-server-tests-jvm", version.ref = "ktor"}
-kotlin-test-junit = {group = "org.jetbrains.kotlin", name = "kotlin-test-junit"}
-ktor-server-test-host-jvm = {group = "io.ktor", name = "ktor-server-test-host-jvm", version.ref = "ktor"}
-kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test"}
+ktor-server-tests = { group = "io.ktor", name = "ktor-server-tests-jvm", version.ref = "ktor" }
+kotlin-test-junit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit" }
+ktor-server-test-host-jvm = { group = "io.ktor", name = "ktor-server-test-host-jvm", version.ref = "ktor" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test" }
 ktor-client-content-negotiation-jvm = { group = "io.ktor", name = "ktor-client-content-negotiation-jvm", version.ref = "ktor" }
 
 
@@ -47,4 +48,4 @@ ktor-client-content-negotiation-jvm = { group = "io.ktor", name = "ktor-client-c
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
-node-gradle = { id = "com.github.node-gradle.node", version.ref = "node-gradle"}
+node-gradle = { id = "com.github.node-gradle.node", version.ref = "node-gradle" }

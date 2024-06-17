@@ -1,4 +1,5 @@
 import com.github.gradle.node.pnpm.task.PnpmTask
+import java.io.FileWriter
 
 plugins {
     alias(libs.plugins.node.gradle)
@@ -29,6 +30,22 @@ tasks.register<Zip>("package") {
 
 tasks.register<Delete>("clean") {
     delete("build", "dist")
+}
+
+tasks.register<DefaultTask>("composeSourceCode") {
+    val appendToFile = project.layout.buildDirectory.file("generated/sourceCode")
+    val appendTo = appendToFile.get().asFile
+    appendTo.parentFile.mkdirs()
+    appendTo.createNewFile()
+    FileWriter(appendTo, Charsets.UTF_8, true).use {
+        val files = project.fileTree("./src").files
+        files.forEach { file ->
+            println("Processing file ${file.path}")
+            it.appendLine("// ${file.relativeTo(project.projectDir.absoluteFile).path}")
+            val content = file.readText(Charsets.UTF_8)
+            it.appendLine(content)
+        }
+    }
 }
 
 fun PnpmTask.pnpmDev() {

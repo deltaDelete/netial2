@@ -40,6 +40,16 @@ fun Application.configureAttachments() = routing {
         call.respond(attachments)
     }
 
+    get("/api/attachments/pages") {
+        val pageSize = call.request.queryParameters["pageSize"]?.toInt() ?: 10
+        val total = dbQuery {
+            Attachment.find { (Attachments.deletionDate eq null) and (Attachments.isDeleted eq false) }
+                .count()
+        }
+        val pages = (total + pageSize - 1) / pageSize
+        call.respond(HttpStatusCode.OK, pages)
+    }
+
     // GET: Get attachment by id
     get("/api/attachments/{id}") {
         val id = call.parameters["id"]?.toLong() ?: throw IllegalArgumentException("Invalid ID")
