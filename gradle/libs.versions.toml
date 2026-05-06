@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.0.0"
 ktor = "2.3.11"
-jakarta-mail = "2.0.1"
+jakarta-mail = "2.0.2"
 exposed = "0.51.1"
 h2 = "2.2.220"
 postgresql = "42.7.3"
